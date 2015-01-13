@@ -34,7 +34,7 @@ $app->get('/api', function() use($app) {
 
 $app->get('/db/', function() use($app) {
     return 'db endpoint';  
-
+/*
     $st = $app['pdo']->prepare('SELECT name FROM test_table');
     $st->execute();
 
@@ -43,6 +43,7 @@ $app->get('/db/', function() use($app) {
         $app['monolog']->addDebug('Row ' . $row['name']);
         $names[] = $row;
     }
+*/
 });
 
 $app->run();
