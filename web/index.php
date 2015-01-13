@@ -13,8 +13,12 @@ $app->register(new Silex\Provider\MonologServiceProvider(), array(
 // Our web handlers
 
 $app->get('/', function() use($app) {
-  $app['monolog']->addDebug('logging output.');
-  return 'Hello';
+    $app['monolog']->addDebug('logging output.');
+    return 'Hello';
+});
+
+$app->get('/api', function() use($app) {
+    return 'API endpoint'; 
 });
 
 $app->run();
