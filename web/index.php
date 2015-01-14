@@ -28,7 +28,7 @@ $app->get('/', function() use($app) {
     return 'Hello';
 });
 
-$app->get('/api', function() use($app) {
+$app->get('/api/', function() use($app) {
     return 'API endpoint'; 
 });
 
