@@ -44,7 +44,7 @@ $app->delete('/api/users', function() use($app) {
     
 }); 
 
-$app->get('/api/images/{id}', function() use($app) {
+$app->get('/api/images/{id}', function($id) use($app) {
     $st = $app['pdo']->prepare('SELECT file FROM images WHERE id=:id');
     
     $st->execute(array(':id' => $id));
