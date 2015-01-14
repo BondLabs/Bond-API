@@ -33,7 +33,7 @@ $app->get('/', function() use($app) {
 });
 
 $app->get('/api/', function(Request $request) use($app) {
-    return $request->$headers;    
+    return $request->HeaderBag; 
 });
 
 $app->post('/api/users', function() use($app) {
