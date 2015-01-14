@@ -32,6 +32,12 @@ $app->get('/api/', function() use($app) {
     return 'API endpoint'; 
 });
 
+$app->get('/api/users', function() use($app) {
+    return 'API endpoint users'; 
+});
+
+
+
 $app->get('/db/', function() use($app) {
     return 'db endpoint';  
     $st = $app['pdo']->prepare('SELECT name FROM test_table');
