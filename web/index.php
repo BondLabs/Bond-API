@@ -33,8 +33,7 @@ $app->get('/', function() use($app) {
 });
 
 $app->get('/api/', function(Request $request) use($app) {
-    $app->json(print_r($request->headers->all()), 200); 
-    return;
+    return $app->json($request->headers->all(), 200); 
 });
 
 $app->post('/api/users', function() use($app) {
