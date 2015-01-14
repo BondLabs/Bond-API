@@ -32,11 +32,13 @@ $app->get('/api/', function() use($app) {
     return 'API endpoint'; 
 });
 
-$app->get('/api/users', function() use($app) {
-    return 'API endpoint users'; 
-});
+$app->post('/api/users', function() use($app) {
+    
+}); 
 
-
+$app->delete('/api/users', function() use($app) {
+    
+}); 
 
 $app->get('/db/', function() use($app) {
     return 'db endpoint';  
