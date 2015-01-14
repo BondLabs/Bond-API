@@ -2,8 +2,12 @@
 
 require('../vendor/autoload.php');
 
+use Symfony\Component\HttpFoundation\Request;
+
+
 $app = new Silex\Application();
 $app['debug'] = true;
+
 
 // Register the monolog logging service
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
