@@ -44,16 +44,17 @@ $app->delete('/api/users', function() use($app) {
     
 }); 
 
+$app->get('/api/images/{id}', function() use($app) {
+    $st = $app['pdo']->prepare('SELECT file FROM images WHERE id=:id');
+    
+    $st->execute(array(':id' => $id);
+
+    $row = $st->fetch(PDO::FETCH_ASSOC);
+    return $app->json($row, 200); 
+}); 
+
 $app->get('/db/', function() use($app) {
     return 'db endpoint';  
-    $st = $app['pdo']->prepare('SELECT name FROM test_table');
-    $st->execute();
-
-    $names = array();
-    while ($row = $st->fetch(PDO::FETCH_ASSOC)) {
-        $app['monolog']->addDebug('Row ' . $row['name']);
-        $names[] = $row;
-    }
 
 });
 
