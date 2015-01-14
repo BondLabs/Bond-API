@@ -47,7 +47,7 @@ $app->delete('/api/users', function() use($app) {
 $app->get('/api/images/{id}', function() use($app) {
     $st = $app['pdo']->prepare('SELECT file FROM images WHERE id=:id');
     
-    $st->execute(array(':id' => $id);
+    $st->execute(array(':id' => $id));
 
     $row = $st->fetch(PDO::FETCH_ASSOC);
     return $app->json($row, 200); 
