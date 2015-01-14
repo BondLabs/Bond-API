@@ -28,12 +28,12 @@ $app->get('/', function() use($app) {
     return 'Hello';
 });
 
-$app->get('/api/', function() use($app) {
-    return 'API endpoint'; 
+$app->get('/api/', function(Request $request) use($app) {
+    return $request->$headers;    
 });
 
 $app->post('/api/users', function() use($app) {
-    
+        
 }); 
 
 $app->delete('/api/users', function() use($app) {
