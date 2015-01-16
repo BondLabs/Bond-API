@@ -44,13 +44,32 @@ $app->delete('/api/users', function() use($app) {
     
 }); 
 
-$app->get('/api/images/{id}', function($id) use($app) {
-    $st = $app['pdo']->prepare('SELECT file FROM images WHERE id=:id');
-    
-    $st->execute(array(':id' => $id));
+$auth = function(Request $request, Application $app) {
+    $headers = $request->headers();
+    $app['monolog']->addDebug(print_r(headers));
+}
 
+$app->get('/api/images/{id}', function($id) use($app) {
+    
+    if( $id < 1 || empty($var) ){
+        return $app->json(array("error" => "Please provide a valid identification number."), 400);
+    }
+    
+    $st = $app['pdo']->prepare('SELECT file FROM images WHERE id=:id');
+    $st->execute(array(':id' => $id));
     $row = $st->fetch(PDO::FETCH_ASSOC);
     return $app->json($row, 200); 
+})
+-> before($auth); 
+
+$app->post('/api/users', function() use($app) {
+    $id = $post['id'];
+    $name = $post['nane'];
+    $email = $post['email'];
+    $phone = $post['password'];
+    $age = $post['age'];
+    $gender = $post['gender'];
+     
 }); 
 
 $app->get('/db/', function() use($app) {
