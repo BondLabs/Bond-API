@@ -46,8 +46,8 @@ $app->delete('/api/users', function() use($app) {
 
 $auth = function(Request $request) use($app) {
     $headers = $request->headers;
-    $head = print_r($headers); 
-    $app['monolog']->addDebug($head);
+    $auth = $headers["auth_key"];
+    $app['monolog']->addDebug($auth);
 };
 
 $app->get('/api/images/{id}', function($id) use($app) {
