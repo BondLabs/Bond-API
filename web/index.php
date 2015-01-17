@@ -46,6 +46,7 @@ $app->delete('/api/users', function() use($app) {
 
 $auth = function(Request $request) use($app) {
     $auth = $request->headers->get("auth_key");
+    echo $auth; 
     $app['monolog']->addDebug($auth);
 };
 
