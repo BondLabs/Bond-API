@@ -45,7 +45,7 @@ $app->delete('/api/users', function() use($app) {
 }); 
 
 $auth = function(Request $request) use($app) {
-    $headers = $request->headers();
+    $headers = $request->headers;
     $head = print_r($headers); 
     $app['monolog']->addDebug($head);
 };
@@ -70,7 +70,13 @@ $app->post('/api/users', function() use($app) {
     $phone = $post['password'];
     $age = $post['age'];
     $gender = $post['gender'];
-     
+
+    if( empty($id) ) {
+        // create new user
+        
+    } else {
+        // update existing user
+    }  
 }); 
 
 $app->get('/db/', function() use($app) {
