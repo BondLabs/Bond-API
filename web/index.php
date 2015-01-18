@@ -49,6 +49,9 @@ function isauthkey($id, $key, $app) {
     $st->execute(array(':key' => $key));
     $uid = $st->fetch(PDO::FETCH_ASSOC);
     $uid = $uid[0]; 
+    
+    $app['monolog']->addDebug("PDO RESULT: ".$uid);
+    
     if($id === $uid){
         return true; 
     }
