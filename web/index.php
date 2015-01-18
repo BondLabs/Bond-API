@@ -44,7 +44,7 @@ $app->delete('/api/users', function() use($app) {
     
 }); 
 
-function isauthkey($id, $key) {
+function isauthkey($id, $key) use($app) {
     $st = $app['pdo']->prepare('SELECT id FROM users WHERE auth_key=:key');
     $st->execute(array(':key' => $key));
     $uid = $st->fetch(PDO::FETCH_ASSOC);
@@ -60,9 +60,11 @@ $auth = function(Request $request) use($app) {
     $passeduid = $request->getRequestUri();
     $passeduid = explode("/", $passeduid);
     $id = $passeduid[2]; 
-    
+
     if(isauthkey($id, $auth)){
         $app['monolog']->addDebug("they match");
+    } else {
+
     }
 };
 
