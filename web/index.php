@@ -61,7 +61,9 @@ $auth = function(Request $request) use($app) {
     $passeduid = explode("/", $passeduid);
     $id = $passeduid[2]; 
 
-    $app['monolog']->addDebug($id); 
+    print_r($passeduid);
+
+    $app['monolog']->addDebug(print_r($passeduid)); 
     $app['monolog']->addDebug($auth); 
     
 
