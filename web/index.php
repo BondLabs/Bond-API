@@ -64,7 +64,7 @@ $auth = function(Request $request) use($app) {
     if(isauthkey($id, $auth, $app)){
         $app['monolog']->addDebug("they match");
     } else {
-
+        $app['monolog']->addDebug("they don't match");
     }
 };
 
