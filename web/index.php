@@ -61,6 +61,10 @@ $auth = function(Request $request) use($app) {
     $passeduid = explode("/", $passeduid);
     $id = $passeduid[2]; 
 
+    $app['monolog']->addDebug($id); 
+    $app['monolog']->addDebug($auth); 
+    
+
     if(isauthkey($id, $auth, $app)){
         $app['monolog']->addDebug("they match");
     } else {
