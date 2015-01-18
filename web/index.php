@@ -49,11 +49,9 @@ $auth = function(Request $request) use($app) {
     
     $st = $app['pdo']->prepare('SELECT id FROM users WHERE auth_key=:key');
     $st->execute(array(':key' => $auth));
-    $row = $st->fetch(PDO::FETCH_ASSOC);
+    $uid = $st->fetch(PDO::FETCH_ASSOC);
 
-    print_r($row);
-    
-    if ($row['id'] === $request->get('id')){
+    if ($uid === $request->get('id')){
     	$app['monolog']->addDebug("they match");
     }
 };
