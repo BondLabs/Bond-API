@@ -48,6 +48,9 @@ function isauthkey($id, $key, $app) {
     $st = $app['pdo']->prepare('SELECT id FROM users WHERE auth_key=:key');
     $st->execute(array(':key' => $key));
     $uid = $st->fetch(PDO::FETCH_ASSOC);
+    
+    print_r($uid);
+    
     //$uid = $uid[0]; 
     
     $app['monolog']->addDebug("PDO RESULT: ".$uid);
