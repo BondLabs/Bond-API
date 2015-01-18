@@ -44,9 +44,23 @@ $app->delete('/api/users', function() use($app) {
     
 }); 
 
+function log($marker, $string) {
+    $app['monolog']->addDebug($marker." :".$string);
+}
+
 $auth = function(Request $request) use($app) {
     $auth = $request->headers->get('x-auth-key');
+    
+    $st = $app['pdo']->prepare('SELECT id FROM users WHERE auth_key=:key');
+    $st->execute(array(':key' => $auth));
+    $row = $st->fetch(PDO::FETCH_ASSOC);
+
+    if ($row['id'] === $request->get('id')){
+        log("AUTH", "matches");
+    }
+    
     $app['monolog']->addDebug("AUTH KEY:".$auth);
+    $app['monolog']->addDebug("row:".print_r($row));
 };
 
 $app->get('/api/images/{id}', function($id) use($app) {
