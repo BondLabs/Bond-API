@@ -59,13 +59,7 @@ $auth = function(Request $request) use($app) {
     $auth = $request->headers->get('x-auth-key');
     $passeduid = $request->getRequestUri();
     $passeduid = explode("/", $passeduid);
-    $id = $passeduid[2]; 
-
-    print_r($passeduid);
-
-    $app['monolog']->addDebug(print_r($passeduid)); 
-    $app['monolog']->addDebug($auth); 
-    
+    $id = $passeduid[3]; 
 
     if(isauthkey($id, $auth, $app)){
         $app['monolog']->addDebug("they match");
