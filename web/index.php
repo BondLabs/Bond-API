@@ -65,7 +65,7 @@ $app->get('/api/images/{id}', function($id) use($app) {
 
 $app->post('/api/users', function() use($app) {
     $id = $post['id'];
-    $name = $post['nane'];
+    $name = $post['name'];
     $email = $post['email'];
     $phone = $post['password'];
     $age = $post['age'];
