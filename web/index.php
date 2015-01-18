@@ -44,26 +44,25 @@ $app->delete('/api/users', function() use($app) {
     
 }); 
 
-$auth = function(Request $request) use($app) {
-
-    //TODO: make middleware more robust for situations where
-    //uid isn't being passed via GET and vice versa
-    //OR add a diff middleware for those reqeusets 
-
-
-    $auth = $request->headers->get('x-auth-key');
+function isauthkey($id, $key) {
     $st = $app['pdo']->prepare('SELECT id FROM users WHERE auth_key=:key');
-    $st->execute(array(':key' => $auth));
+    $st->execute(array(':key' => $key));
     $uid = $st->fetch(PDO::FETCH_ASSOC);
+    $uid = $uid[0]; 
+    if($id === $uid){
+        return true; 
+    }
+    return false;
+}
 
+$auth = function(Request $request) use($app) {
+    $auth = $request->headers->get('x-auth-key');
     $passeduid = $request->getRequestUri();
-
-    $app['monolog']->addDebug("UID: ".$uid);
-    $app['monolog']->addDebug("PASSED: ".$passeduid);
-
-
-    if ($uid === $passeduid){
-    	$app['monolog']->addDebug("they match");
+    $passeduid = explode("/", $passeduid);
+    $id = $passeduid[2]; 
+    
+    if(isauthkey($id, $auth)){
+        $app['monolog']->addDebug("they match");
     }
 };
 
