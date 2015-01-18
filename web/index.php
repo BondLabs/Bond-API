@@ -44,10 +44,6 @@ $app->delete('/api/users', function() use($app) {
     
 }); 
 
-function log($marker, $string) {
-    $app['monolog']->addDebug($marker." :".$string);
-}
-
 $auth = function(Request $request) use($app) {
     $auth = $request->headers->get('x-auth-key');
     
@@ -56,7 +52,7 @@ $auth = function(Request $request) use($app) {
     $row = $st->fetch(PDO::FETCH_ASSOC);
 
     if ($row['id'] === $request->get('id')){
-        log("AUTH", "matches");
+    	$app['monolog']->addDebug("they match");
     }
     
     $app['monolog']->addDebug("AUTH KEY:".$auth);
