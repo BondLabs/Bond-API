@@ -51,12 +51,11 @@ $auth = function(Request $request) use($app) {
     $st->execute(array(':key' => $auth));
     $row = $st->fetch(PDO::FETCH_ASSOC);
 
+    print_r($row);
+    
     if ($row['id'] === $request->get('id')){
     	$app['monolog']->addDebug("they match");
     }
-    
-    $app['monolog']->addDebug("AUTH KEY:".$auth);
-    $app['monolog']->addDebug("row:".print_r($row));
 };
 
 $app->get('/api/images/{id}', function($id) use($app) {
