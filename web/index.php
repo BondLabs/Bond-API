@@ -44,7 +44,7 @@ $app->delete('/api/users', function() use($app) {
     
 }); 
 
-$auth = function(Request $request, $id) use($app) {
+$auth = function(Request $request) use($app) {
 
     //TODO: make middleware more robust for situations where
     //uid isn't being passed via GET and vice versa
@@ -56,10 +56,10 @@ $auth = function(Request $request, $id) use($app) {
     $st->execute(array(':key' => $auth));
     $uid = $st->fetch(PDO::FETCH_ASSOC);
 
-    $passeduid = $request->query->get('id');
+    $passeduid = $request->getRequestUri();
 
     $app['monolog']->addDebug("UID: ".$uid);
-    $app['monolog']->addDebug("PASSED: ".$id);
+    $app['monolog']->addDebug("PASSED: ".$passeduid);
 
 
     if ($uid === $passeduid){
