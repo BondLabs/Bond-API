@@ -50,7 +50,7 @@ function isauthkey($id, $key, $app) {
     $res = $st->fetch(PDO::FETCH_ASSOC);
     $uid = $res['id']; 
 
-    if($id === $uid){
+    if($id == $uid){
         return true; 
     }
     return false;
