@@ -62,24 +62,28 @@ $auth = function(Request $request) use($app) {
     $passeduid = explode("/", $passeduid);
     $id = $passeduid[3]; 
 
-    echo $id;
+    if(!isauthkey($id, $auth, $app)){
+        return $app->json(array("error" => "Invalid authorization key."), 401);
+    }
 
-    if(isauthkey($id, $auth, $app)){
-        $app['monolog']->addDebug("they match");
-    } else {
-        $app['monolog']->addDebug("they don't match");
+    if( $id < 1 || empty($id) ){
+        return $app->json(array("error" => "Please provide a valid identification number."), 400);
+    }
+    
+    if(empty($auth)) {
+        return $app->json(array("error" => "Authorization key is missing."), 403);     
     }
 };
 
 $app->get('/api/images/{id}', function($id) use($app) {
-    
-    if( $id < 1 || empty($var) ){
-        return $app->json(array("error" => "Please provide a valid identification number."), 400);
-    }
-    
     $st = $app['pdo']->prepare('SELECT file FROM images WHERE id=:id');
     $st->execute(array(':id' => $id));
     $row = $st->fetch(PDO::FETCH_ASSOC);
+    
+    if(empty($row) || $st->rowCount() < 1) {
+        return $app->json(array("error" => "No image was found for the given identification number."), 400); 
+    }
+    
     return $app->json($row, 200); 
 })
 -> before($auth); 
