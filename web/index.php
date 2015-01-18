@@ -47,8 +47,8 @@ $app->delete('/api/users', function() use($app) {
 function isauthkey($id, $key, $app) {
     $st = $app['pdo']->prepare('SELECT id FROM users WHERE auth_key=:key');
     $st->execute(array(':key' => $key));
-    $uid = $st->fetch(PDO::FETCH_ASSOC);
-    $uid = $uid['id']; 
+    $res = $st->fetch(PDO::FETCH_ASSOC);
+    $uid = $res['id']; 
 
     if($id === $uid){
         return true; 
