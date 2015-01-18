@@ -46,12 +46,13 @@ $app->delete('/api/users', function() use($app) {
 
 $auth = function(Request $request) use($app) {
     $auth = $request->headers->get('x-auth-key');
-    
     $st = $app['pdo']->prepare('SELECT id FROM users WHERE auth_key=:key');
     $st->execute(array(':key' => $auth));
     $uid = $st->fetch(PDO::FETCH_ASSOC);
 
-    if ($uid === $request->get('id')){
+    $passeduid = $request->query->get('id');
+
+    if ($uid === $passeduid){
     	$app['monolog']->addDebug("they match");
     }
 };
