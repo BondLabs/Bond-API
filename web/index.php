@@ -44,7 +44,7 @@ $app->delete('/api/users', function() use($app) {
     
 }); 
 
-$auth = function(Request $request) use($app) {
+$auth = function(Request $request, $id) use($app) {
 
     //TODO: make middleware more robust for situations where
     //uid isn't being passed via GET and vice versa
@@ -59,7 +59,7 @@ $auth = function(Request $request) use($app) {
     $passeduid = $request->query->get('id');
 
     $app['monolog']->addDebug("UID: ".$uid);
-    $app['monolog']->addDebug("PASSED: ".$passeduid);
+    $app['monolog']->addDebug("PASSED: ".$id);
 
 
     if ($uid === $passeduid){
