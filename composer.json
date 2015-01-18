@@ -2,7 +2,8 @@
   "require" : {
     "silex/silex": "~1.1",
     "monolog/monolog": "~1.7",
-    "herrera-io/silex-pdo": "~1.2"
+    "herrera-io/silex-pdo": "~1.2",
+    "respect/validation": "0.7.*"
   },
   "require-dev": {
     "heroku/heroku-buildpack-php": "*"

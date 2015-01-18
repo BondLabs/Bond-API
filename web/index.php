@@ -4,6 +4,8 @@ require('../vendor/autoload.php');
 
 use Symfony\Component\HttpFoundation\Request;
 
+// Validation class
+use Respect\Validation\Validator as v;
 
 $app = new Silex\Application();
 $app['debug'] = true;
@@ -88,6 +90,20 @@ $app->get('/api/images/{id}', function($id) use($app) {
 })
 -> before($auth); 
 
+function doesexist($email, $app){
+    $st = $app['pdo']->prepare('SELECT id FROM users WHERE email=:email');
+    $st->execute(array(':email' => $email));
+    $res = $st->fetch(PDO::FETCH_ASSOC);
+    if($st->rowCount() > 0) {
+        return true;
+    }
+    return false;
+}
+
+$app->get('/api/exist/{email}', function($email) use($app) {
+    return doesexist($email, $app); 
+}
+
 $app->post('/api/users', function() use($app) {
     $id = $post['id'];
     $name = $post['name'];
@@ -96,18 +112,37 @@ $app->post('/api/users', function() use($app) {
     $age = $post['age'];
     $gender = $post['gender'];
 
-    if( empty($id) ) {
+    $valid = array();
+    $valid["name"] = v::string()->length(1,32)->validate($name);
+    $valid["email"] = v::email()->validate($email);
+    $valid["phone"] = v::phone()->validate($phone); 
+    $valid["age"] = v::numeric()->validate($age);
+
+    $error = "";
+
+    foreach($valid as $key=>$value) {
+        if(!$valid[$key]) {
+            $error.=$key." ";
+        }
+    }
+    
+    if(strlen($error) > 0) {
+        return $app->json(array("error" => "Please provide a valid ".$error), 400);
+    }
+
+    if(empty($id)) {
         // create new user
+        
+        // first check if user exists
+        if(doesexist($email)) {
+            return $app->json(array("error" => "An account with the given information already exists."), 409); 
+        }
+        
         
     } else {
         // update existing user
     }  
 }); 
-
-$app->get('/db/', function() use($app) {
-    return 'db endpoint';  
-
-});
 
 $app->run();
 
