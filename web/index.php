@@ -82,7 +82,7 @@ $app->get('/api/images/{id}', function($id) use($app) {
     $st->execute(array(':id' => $id));
     $row = $st->fetch(PDO::FETCH_ASSOC);
     
-    if(empty($row) || $st->rowCount() < 1{
+    if(empty($row) || $st->rowCount() < 1){
         return $app->json(array("error" => "No image was found for the given identification number."), 400); 
     }
     
