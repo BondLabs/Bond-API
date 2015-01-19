@@ -108,17 +108,13 @@ $app->get('/api/exist/{email}', function($email) use($app) {
     return "email does not exist";
 });
 
-$app->post('/api/posttest', function(Request $request) use($app) {
-    return $request->get('stuff'); 
-});
-
-$app->post('/api/users', function() use($app) {
-    $id = $post['id'];
-    $name = $post['name'];
-    $email = $post['email'];
-    $phone = $post['password'];
-    $age = $post['age'];
-    $gender = $post['gender'];
+$app->post('/api/users', function(Request $request) use($app) {
+    $id = $request->get('id');
+    $name = $request->get('name');
+    $email = $request->get('email');
+    $phone = $request->get('phone');
+    $age = $request->get('age');
+    $gender = $request->get('gender');
 
     $valid = array();
     $valid["name"] = v::string()->length(1,32)->validate($name);
@@ -146,9 +142,10 @@ $app->post('/api/users', function() use($app) {
         }
         
         // email does not exist, continue to create user 
-        
+        return $app->json(array("log" => "create user here"), 200);
     } else {
         // update existing user
+        return $app->json(array("log" => "update existing user"), 200);
     }  
 }); 
 
