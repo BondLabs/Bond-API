@@ -90,7 +90,7 @@ $app->get('/api/images/{id}', function($id) use($app) {
 })
 -> before($auth); 
 
-function doesexist($email, $app){
+function doesexist($email, $app) {
     $st = $app['pdo']->prepare('SELECT id FROM users WHERE email=:email');
     $st->execute(array(':email' => $email));
     $res = $st->fetch(PDO::FETCH_ASSOC);
@@ -102,7 +102,7 @@ function doesexist($email, $app){
 
 $app->get('/api/exist/{email}', function($email) use($app) {
     return doesexist($email, $app); 
-}
+});
 
 $app->post('/api/users', function() use($app) {
     $id = $post['id'];
