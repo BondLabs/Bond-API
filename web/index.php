@@ -108,7 +108,7 @@ $app->get('/api/exist/{email}', function($email) use($app) {
     return "email does not exist";
 });
 
-$app->post('/api/posttest', function() use($app) {
+$app->post('/api/posttest', function(Request $request) use($app) {
     return $request->get('stuff'); 
 });
 
