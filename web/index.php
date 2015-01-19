@@ -100,8 +100,12 @@ function doesexist($email, $app) {
     return false;
 }
 
+// test email does exist function
 $app->get('/api/exist/{email}', function($email) use($app) {
-    return doesexist($email, $app); 
+    if(doesexist($email, $app)){
+        return "email exists";     
+    }
+    return "email does not exist";
 });
 
 $app->post('/api/users', function() use($app) {
