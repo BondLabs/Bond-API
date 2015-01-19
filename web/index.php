@@ -100,12 +100,16 @@ function doesexist($email, $app) {
     return false;
 }
 
-// test email does exist function
+// test if email exists or not
 $app->get('/api/exist/{email}', function($email) use($app) {
     if(doesexist($email, $app)){
         return "email exists";     
     }
     return "email does not exist";
+});
+
+$app->post('/api/posttest', function() use($app) {
+    return $post['stuff']; 
 });
 
 $app->post('/api/users', function() use($app) {
@@ -136,12 +140,12 @@ $app->post('/api/users', function() use($app) {
 
     if(empty($id)) {
         // create new user
-        
-        // first check if user exists
-        if(doesexist($email)) {
+        // first check if email exists
+        if(doesexist($email, $app)) {
             return $app->json(array("error" => "An account with the given information already exists."), 409); 
         }
         
+        // email does not exist, continue to create user 
         
     } else {
         // update existing user
