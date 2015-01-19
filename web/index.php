@@ -109,7 +109,7 @@ $app->get('/api/exist/{email}', function($email) use($app) {
 });
 
 $app->post('/api/posttest', function() use($app) {
-    return $post['stuff']; 
+    return $request->get('stuff'); 
 });
 
 $app->post('/api/users', function() use($app) {
