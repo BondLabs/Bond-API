@@ -103,14 +103,6 @@ function doesexist($email, $app) {
     return false;
 }
 
-// test if email exists or not
-$app->get('/api/exist/{email}', function($email) use($app) {
-    if(doesexist($email, $app)){
-        return "email exists";     
-    }
-    return "email does not exist";
-});
-
 $app->delete('/api/users/{id}', function($id) use($app) {
     $st = $app['pdo']->prepare('DELETE FROM users WHERE id=:id');
     $st->execute(array(':id' => $id));
