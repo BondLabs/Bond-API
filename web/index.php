@@ -17,23 +17,27 @@ $app->register(new Silex\Provider\MonologServiceProvider(), array(
 ));
 
 $dbopts = parse_url(getenv('DATABASE_URL'));
-$app->register(new Herrera\Pdo\PdoServiceProvider(),
-  array(
-      'pdo.dsn' => 'pgsql:dbname=bond;host=localhost',
-      'pdo.port' => 5432,
-      'pdo.username' => "misbahkhan",
-      'pdo.password' => ""
-  )
-);
-/*$app->register(new Herrera\Pdo\PdoServiceProvider(),
-  array(
-      'pdo.dsn' => 'pgsql:dbname='.ltrim($dbopts["path"],'/').';host='.$dbopts["host"],
-      'pdo.port' => $dbopts["port"],
-      'pdo.username' => $dbopts["user"],
-      'pdo.password' => $dbopts["pass"]
-  )
-);*/
-
+/*
+if($dbopts) {
+    $app->register(new Herrera\Pdo\PdoServiceProvider(),
+      array(
+          'pdo.dsn' => 'pgsql:dbname='.ltrim($dbopts["path"],'/').';host='.$dbopts["host"],
+          'pdo.port' => $dbopts["port"],
+          'pdo.username' => $dbopts["user"],
+          'pdo.password' => $dbopts["pass"]
+      )
+    );
+} else {
+*/
+    $app->register(new Herrera\Pdo\PdoServiceProvider(),
+      array(
+          'pdo.dsn' => 'pgsql:dbname=bond;host=localhost',
+          'pdo.port' => 5432,
+          'pdo.username' => "misbahkhan",
+          'pdo.password' => ""
+      )
+    );
+//}
 
 // Our web handlers
 
@@ -117,11 +121,13 @@ $app->post('/api/users', function(Request $request) use($app) {
     $name = $request->get('name');
     $email = $request->get('email');
     $phone = $request->get('phone');
+    $password = $request->get('password');
     $age = $request->get('age');
     $gender = $request->get('gender');
 
     $valid = array();
     $valid["name"] = v::string()->length(1,32)->validate($name);
+    $valid["password"] = v::string()->length(1,64)->validate($password);
     $valid["email"] = v::email()->validate($email);
     $valid["phone"] = v::phone()->validate($phone); 
     $valid["age"] = v::numeric()->validate($age);
@@ -139,14 +145,26 @@ $app->post('/api/users', function(Request $request) use($app) {
     }
 
     if(empty($id)) {
-        // create new user
-        // first check if email exists
+        // new user might need to be created 
+        // check if email exists
         if(doesexist($email, $app)) {
             return $app->json(array("error" => "An account with the given information already exists."), 409); 
         }
         
         // email does not exist, continue to create user 
-        return $app->json(array("log" => "create user here"), 200);
+
+        // hash the password
+        $password = password_hash($password, PASSWORD_DEFAULT);
+        
+        // insert into the database 
+        $st = $app['pdo']->prepare("INSERT INTO users(name, email, phone, age) VALUES(:name, :email, :phone, :age) RETURNING id");
+        $st->execute(array('name' => $name, 'email' => $email, 'phone' => $phone, 'age' => $age));
+        
+        $insertedrow = $st->fetchAll(); 
+
+        // $insertedrow[0][{param}] seems to work, hopefully wont break ever.
+        // return success json
+        return $app->json(array("success" => "New user created", "id" => $insertedrow[0]["id"]), 200);
     } else {
         // update existing user
         return $app->json(array("log" => "update existing user"), 200);
