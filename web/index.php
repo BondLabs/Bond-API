@@ -49,10 +49,6 @@ $app->get('/api/', function(Request $request) use($app) {
     return $app->json($request->headers->all(), 200); 
 });
 
-$app->delete('/api/users', function() use($app) {
-    
-}); 
-
 function isauthkey($id, $key, $app) {
     $st = $app['pdo']->prepare('SELECT id FROM users WHERE auth_key=:key');
     $st->execute(array(':key' => $key));
@@ -114,6 +110,12 @@ $app->get('/api/exist/{email}', function($email) use($app) {
     }
     return "email does not exist";
 });
+
+$app->delete('/api/users/{id}', function($id) use($app) {
+    $st = $app['pdo']->prepare('DELETE FROM users WHERE id=:id');
+    $st->execute(array(':id' => $id));
+    return $app->json(array("message" => "success"), 200); 
+})->before($auth); 
 
 $app->get('/api/users/{id}', function($id) use($app) {
     $st = $app['pdo']->prepare('SELECT * FROM users WHERE id=:id');
