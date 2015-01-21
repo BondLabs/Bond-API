@@ -115,6 +115,21 @@ $app->get('/api/exist/{email}', function($email) use($app) {
     return "email does not exist";
 });
 
+$app->get('/api/users/{id}', function($id) use($app) {
+    $st = $app['pdo']->prepare('SELECT * FROM users WHERE id=:id');
+    $st->execute(array(':id' => $id));
+    $row = $st->fetch(PDO::FETCH_ASSOC);
+    
+    unset($row["auth_key"]); 
+    
+    if(empty($row) || $st->rowCount() < 1){
+        return $app->json(array("error" => "Please provide a valid identification number."), 400); 
+    }
+    
+    return $app->json($row, 200); 
+})->before($auth); 
+
+// TODO: add auth middleware for following endpoint
 $app->post('/api/users', function(Request $request) use($app) {
     $id = $request->get('id');
     $name = $request->get('name');
