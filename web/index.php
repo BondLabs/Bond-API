@@ -19,12 +19,20 @@ $app->register(new Silex\Provider\MonologServiceProvider(), array(
 $dbopts = parse_url(getenv('DATABASE_URL'));
 $app->register(new Herrera\Pdo\PdoServiceProvider(),
   array(
+      'pdo.dsn' => 'pgsql:dbname=bond;host=localhost',
+      'pdo.port' => 5432,
+      'pdo.username' => "misbahkhan",
+      'pdo.password' => ""
+  )
+);
+/*$app->register(new Herrera\Pdo\PdoServiceProvider(),
+  array(
       'pdo.dsn' => 'pgsql:dbname='.ltrim($dbopts["path"],'/').';host='.$dbopts["host"],
       'pdo.port' => $dbopts["port"],
       'pdo.username' => $dbopts["user"],
       'pdo.password' => $dbopts["pass"]
   )
-);
+);*/
 
 
 // Our web handlers
@@ -37,10 +45,6 @@ $app->get('/', function() use($app) {
 $app->get('/api/', function(Request $request) use($app) {
     return $app->json($request->headers->all(), 200); 
 });
-
-$app->post('/api/users', function() use($app) {
-        
-}); 
 
 $app->delete('/api/users', function() use($app) {
     
