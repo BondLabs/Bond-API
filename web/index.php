@@ -93,6 +93,19 @@ $app->get('/api/images/{id}', function($id) use($app) {
 })
 -> before($auth); 
 
+$app->delete('/api/images/{id}', function($id) use($app) {
+    $st = $app['pdo']->prepare('DELETE FROM images WHERE id=:id');
+    $st->execute(array(':id' => $id));
+
+    if($st->rowCount() > 0) {
+        return $app->json(array("error" => "No image was found with the given identification number."), 412);
+    } else {
+        return $app->json(array("message" => "success"), 200); 
+    }
+
+    return $app->json(array("error" => "Something went wrong.  Please try again later."), 500);
+})->before($auth); 
+
 function doesexist($email, $app) {
     $st = $app['pdo']->prepare('SELECT id FROM users WHERE email=:email');
     $st->execute(array(':email' => $email));
