@@ -62,6 +62,8 @@ function isauthkey($id, $key, $app) {
     return false;
 }
 
+
+// TODO: finish the auth in less functions, because it's possible, and this is ugly
 $auth = function(Request $request) use($app) {
     $auth = $request->headers->get('x-auth-key');
     $passeduid = $request->getRequestUri();
@@ -72,7 +74,24 @@ $auth = function(Request $request) use($app) {
         return $app->json(array("error" => "Invalid authorization key."), 401);
     }
 
-    if( $id < 1 || empty($id) ){
+    if($id < 1 || empty($id)){
+        return $app->json(array("error" => "Please provide a valid identification number."), 400);
+    }
+    
+    if(empty($auth)) {
+        return $app->json(array("error" => "Authorization key is missing."), 403);     
+    }
+};
+
+$authPOST = function(Request $request) use($app) {
+	$auth = $request->headers->get('x-auth-key'); 
+	$passeduid = $request->get('id');
+
+    if(!isauthkey($id, $auth, $app)){
+        return $app->json(array("error" => "Invalid authorization key."), 401);
+    }
+
+    if($id < 1 || empty($id)){
         return $app->json(array("error" => "Please provide a valid identification number."), 400);
     }
     
@@ -82,7 +101,8 @@ $auth = function(Request $request) use($app) {
 };
 
 
-$app->get('/api/locations/{id}', function($id) use ($app) {
+
+$app->get('/api/locations/{id}', function($id) use($app) {
     $st = $app['pdo']->prepare('SELECT latitude, longitude FROM locations WHERE id=:id');
     $st->execute(array(':id' => $id));
     $row = $st->fetch(PDO::FETCH_ASSOC);
@@ -92,6 +112,10 @@ $app->get('/api/locations/{id}', function($id) use ($app) {
     }
 })
 -> before($auth); 
+
+$app->post('/api/locations', function($id) use($app) {
+
+}); 
 
 $app->get('/api/images/{id}', function($id) use($app) {
     $st = $app['pdo']->prepare('SELECT file FROM images WHERE id=:id');
