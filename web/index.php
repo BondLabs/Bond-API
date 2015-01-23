@@ -173,6 +173,20 @@ $app->get('/api/users/{id}', function($id) use($app) {
     return $app->json($row, 200); 
 })->before($auth); 
 
+// Probably shouldn't make a middle ware for auth key validation for this one
+$app->post('/api/login', function(Request $request) use ($app) {
+	$auth = $request->headers->get('x-auth-key'); 
+	$email = $request->get('email');
+	$password = $request->get('password');
+
+    $st = $app['pdo']->prepare('SELECT email, password FROM users WHERE auth_key=:auth');
+    $st->execute(array(':auth' => $auth));
+    $row = $st->fetch(PDO::FETCH_ASSOC);
+
+	echo $row; 
+
+	return $app->json($row, 200); 
+});
 
 // TODO: add auth middleware for following endpoint
 $app->post('/api/users', function(Request $request) use($app) {
@@ -216,8 +230,8 @@ $app->post('/api/users', function(Request $request) use($app) {
         $password = password_hash($password, PASSWORD_DEFAULT);
         
         // insert into the database 
-        $st = $app['pdo']->prepare("INSERT INTO users(name, email, phone, age) VALUES(:name, :email, :phone, :age) RETURNING id");
-        $st->execute(array('name' => $name, 'email' => $email, 'phone' => $phone, 'age' => $age));
+        $st = $app['pdo']->prepare("INSERT INTO users(name, email, phone, age, password) VALUES(:name, :email, :phone, :age, :password) RETURNING id");
+        $st->execute(array('name' => $name, 'email' => $email, 'phone' => $phone, 'age' => $age, 'password' => $password));
         
         $insertedrow = $st->fetchAll(); 
 
