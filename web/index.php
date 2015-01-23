@@ -136,6 +136,7 @@ $app->get('/api/users/{id}', function($id) use($app) {
     return $app->json($row, 200); 
 })->before($auth); 
 
+
 // TODO: add auth middleware for following endpoint
 $app->post('/api/users', function(Request $request) use($app) {
     $id = $request->get('id');
