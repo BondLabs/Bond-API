@@ -81,6 +81,18 @@ $auth = function(Request $request) use($app) {
     }
 };
 
+
+$app->get('/api/locations/{id}', function($id) use ($app) {
+    $st = $app['pdo']->prepare('SELECT latitude, longitude FROM locations WHERE id=:id');
+    $st->execute(array(':id' => $id));
+    $row = $st->fetch(PDO::FETCH_ASSOC);
+   
+    if(empty($row) || $st->rowCount() < 1){
+        return $app->json(array("error" => "No location was found for the given identification number."), 400); 
+    }
+})
+-> before($auth); 
+
 $app->get('/api/images/{id}', function($id) use($app) {
     $st = $app['pdo']->prepare('SELECT file FROM images WHERE id=:id');
     $st->execute(array(':id' => $id));
