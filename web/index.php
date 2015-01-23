@@ -168,8 +168,6 @@ $app->post('/api/users', function(Request $request) use($app) {
     }
 
     if(empty($id)) {
-        $app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
         // new user might need to be created 
         // check if email exists
         if(doesexist($email, $app)) {
