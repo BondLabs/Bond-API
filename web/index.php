@@ -173,17 +173,22 @@ $app->get('/api/users/{id}', function($id) use($app) {
     return $app->json($row, 200); 
 })->before($auth); 
 
-// Probably shouldn't make a middle ware for auth key validation for this one
+
+// Need to check API key. 
 $app->post('/api/login', function(Request $request) use ($app) {
-	$auth = $request->headers->get('x-auth-key'); 
+	$app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$auth = $request->headers->get('x-api-key'); 
 	$email = $request->get('email');
 	$password = $request->get('password');
 
-    $st = $app['pdo']->prepare('SELECT email, password FROM users WHERE auth_key=:auth');
-    $st->execute(array(':auth' => $auth));
+    $st = $app['pdo']->prepare('SELECT id, auth_key, password FROM users WHERE email=:email');
+    $st->execute(array(':email' => $email));
     $row = $st->fetch(PDO::FETCH_ASSOC);
 
-	echo $row; 
+	if(password_verify($password, $row['password'])){
+		unset($row['password']); 
+		return $app->json($row, 200); 
+	}
 
 	return $app->json($row, 200); 
 });
