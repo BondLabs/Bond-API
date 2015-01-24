@@ -173,24 +173,37 @@ $app->get('/api/users/{id}', function($id) use($app) {
     return $app->json($row, 200); 
 })->before($auth); 
 
-
-// Need to check API key. 
 $app->post('/api/login', function(Request $request) use ($app) {
 	$app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	$auth = $request->headers->get('x-api-key'); 
+	$api_key = $request->headers->get('x-api-key'); 
+
+	if(empty($api_key)){
+		return $app->json(array("error" => "API key is missing."), 403); 
+	}
+
+	if($api_key != ""){
+		return $app->json(array("error" => "Invalid API key."), 401); 
+	}
+	
 	$email = $request->get('email');
 	$password = $request->get('password');
 
     $st = $app['pdo']->prepare('SELECT id, auth_key, password FROM users WHERE email=:email');
     $st->execute(array(':email' => $email));
     $row = $st->fetch(PDO::FETCH_ASSOC);
+	
+	if($st->rowCount() < 1) {
+		return $app->json(array("error" => "Please provide a valid username."), 400); 
+	}
 
 	if(password_verify($password, $row['password'])){
 		unset($row['password']); 
 		return $app->json($row, 200); 
+	} else {
+		return $app->json(array("error" => "Please provide a valid password."), 400); 
 	}
 
-	return $app->json($row, 200); 
+	return $app->json(array("error" => "Something went wrong.  Please try again later."), 500); 
 });
 
 // TODO: add auth middleware for following endpoint
