@@ -232,7 +232,7 @@ $app->post('/api/login', function(Request $request) use ($app) {
 		return $app->json(array("error" => "API key is missing."), 403); 
 	}
 
-	if($api_key != ""){
+	if($api_key != "37D74DBC-C160-455D-B4AE-A6396FEE7954"){
 		return $app->json(array("error" => "Invalid API key."), 401); 
 	}
 	
