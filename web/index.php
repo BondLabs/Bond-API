@@ -103,6 +103,17 @@ $app->get('/api/locations/{id}', function($id) use($app) {
 })
 -> before($auth); 
 
+$app->delete('/api/locations/{id}', function($id) use($app) {
+    $st = $app['pdo']->prepare('DELETE FROM locations WHERE id=:id');
+    $st->execute(array(':id' => $id));
+
+    if($st->rowCount() > 0){
+    	return $app->json(array("message" => "success"), 200); 
+    }
+    return $app->json(array("error" => "Please provide a valid identification number."), 400); 
+})
+-> before($auth); 
+
 $app->post('/api/locations', function(Request $request) use($app) {
 	$app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	$id = $request->get('id'); 
@@ -115,7 +126,7 @@ $app->post('/api/locations', function(Request $request) use($app) {
 
 	$st = $app['pdo']->prepare("SELECT id FROM locations WHERE id=:id"); 
 	$st->execute(array(':id' => $id)); 
-	
+
 	if($st->rowCount() > 0){
 		// update old location
 		$st = $app['pdo']->prepare("UPDATE locations SET latitude=:lat, longitude=:lon WHERE id=:id"); 
