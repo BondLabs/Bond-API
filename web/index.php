@@ -261,7 +261,7 @@ $app->post('/api/login', function(Request $request) use ($app) {
 $app->post('/api/users', function(Request $request) use($app) {
     $id = $request->get('id');
     $name = $request->get('name');
-    $email = $request->get('email');
+//    $email = $request->get('email');
     $phone = $request->get('phone');
     $password = $request->get('password');
     $age = $request->get('age');
@@ -270,7 +270,7 @@ $app->post('/api/users', function(Request $request) use($app) {
     $valid = array();
     $valid["name"] = v::string()->length(1,32)->validate($name);
     $valid["password"] = v::string()->length(1,64)->validate($password);
-    $valid["email"] = v::email()->validate($email);
+//    $valid["email"] = v::email()->validate($email);
     $valid["phone"] = v::phone()->validate($phone); 
     $valid["age"] = v::numeric()->validate($age);
 
@@ -299,8 +299,8 @@ $app->post('/api/users', function(Request $request) use($app) {
         $password = password_hash($password, PASSWORD_DEFAULT);
         
         // insert into the database 
-        $st = $app['pdo']->prepare("INSERT INTO users(name, email, phone, age, password) VALUES(:name, :email, :phone, :age, :password) RETURNING id");
-        $st->execute(array('name' => $name, 'email' => $email, 'phone' => $phone, 'age' => $age, 'password' => $password));
+        $st = $app['pdo']->prepare("INSERT INTO users(name, phone, age, password) VALUES(:name, :phone, :age, :password) RETURNING id");
+        $st->execute(array('name' => $name, 'phone' => $phone, 'age' => $age, 'password' => $password));
         
         $insertedrow = $st->fetchAll(); 
 
