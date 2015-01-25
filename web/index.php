@@ -236,15 +236,15 @@ $app->post('/api/login', function(Request $request) use ($app) {
 		return $app->json(array("error" => "Invalid API key."), 401); 
 	}
 	
-	$email = $request->get('email');
+	$phone = $request->get('phone');
 	$password = $request->get('password');
 
-    $st = $app['pdo']->prepare('SELECT id, auth_key, password FROM users WHERE email=:email');
-    $st->execute(array(':email' => $email));
+    $st = $app['pdo']->prepare('SELECT id, auth_key, password FROM users WHERE phone=:phone');
+    $st->execute(array(':phone' => $phone));
     $row = $st->fetch(PDO::FETCH_ASSOC);
 	
 	if($st->rowCount() < 1) {
-		return $app->json(array("error" => "Please provide a valid username."), 400); 
+		return $app->json(array("error" => "Please provide a valid phone number."), 400); 
 	}
 
 	if(password_verify($password, $row['password'])){
