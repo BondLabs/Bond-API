@@ -1,5 +1,6 @@
 <?php
 
+// TODO: make a function to check if row exists for a given ID
 
 require('../vendor/autoload.php');
 
@@ -256,7 +257,7 @@ $app->post('/api/login', function(Request $request) use ($app) {
 	return $app->json(array("error" => "Something went wrong.  Please try again later."), 500); 
 });
 
-// TODO: add auth middleware for following endpoint
+// TODO: update existing user
 $app->post('/api/users', function(Request $request) use($app) {
     $id = $request->get('id');
     $name = $request->get('name');
@@ -310,7 +311,7 @@ $app->post('/api/users', function(Request $request) use($app) {
         // update existing user
         return $app->json(array("log" => "update existing user"), 200);
     }  
-}); 
+});
 
 $app->run();
 
