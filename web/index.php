@@ -62,45 +62,35 @@ function isauthkey($id, $key, $app) {
     return false;
 }
 
+function autherrors($id, $key, $app) {	
+	if(!isauthkey($id, $key, $app)){
+        return $app->json(array("error" => "Invalid authorization key."), 401);
+    }
 
-// TODO: finish the auth in less functions, because it's possible, and this is ugly
+    if($id < 1 || empty($id)){
+        return $app->json(array("error" => "Please provide a valid identification number."), 400);
+    }
+    
+    if(empty($key)) {
+        return $app->json(array("error" => "Authorization key is missing."), 403);     
+	}
+}
+
 $auth = function(Request $request) use($app) {
     $auth = $request->headers->get('x-auth-key');
     $passeduid = $request->getRequestUri();
     $passeduid = explode("/", $passeduid);
     $id = $passeduid[3]; 
 
-    if(!isauthkey($id, $auth, $app)){
-        return $app->json(array("error" => "Invalid authorization key."), 401);
-    }
-
-    if($id < 1 || empty($id)){
-        return $app->json(array("error" => "Please provide a valid identification number."), 400);
-    }
-    
-    if(empty($auth)) {
-        return $app->json(array("error" => "Authorization key is missing."), 403);     
-    }
+	return autherrors($id, $auth, $app);
 };
 
 $authPOST = function(Request $request) use($app) {
 	$auth = $request->headers->get('x-auth-key'); 
-	$passeduid = $request->get('id');
+	$id = $request->get('id');
 
-    if(!isauthkey($id, $auth, $app)){
-        return $app->json(array("error" => "Invalid authorization key."), 401);
-    }
-
-    if($id < 1 || empty($id)){
-        return $app->json(array("error" => "Please provide a valid identification number."), 400);
-    }
-    
-    if(empty($auth)) {
-        return $app->json(array("error" => "Authorization key is missing."), 403);     
-    }
+	return autherrors($id, $auth, $app); 
 };
-
-
 
 $app->get('/api/locations/{id}', function($id) use($app) {
     $st = $app['pdo']->prepare('SELECT latitude, longitude FROM locations WHERE id=:id');
@@ -113,9 +103,32 @@ $app->get('/api/locations/{id}', function($id) use($app) {
 })
 -> before($auth); 
 
-$app->post('/api/locations', function($id) use($app) {
+$app->post('/api/locations', function(Request $request) use($app) {
+	$app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$id = $request->get('id'); 
+	$lat = $request->get('latitude'); 
+	$lon = $request->get('longitude'); 
 
-}); 
+	if(!(v::float()->validate($lat) && v::float()->validate($lon))){
+		return $app->json(array("error" => "Please provide a valid location."), 400); 		
+	}
+
+	$st = $app['pdo']->prepare("SELECT id FROM locations WHERE id=:id"); 
+	$st->execute(array(':id' => $id)); 
+	
+	if($st->rowCount() > 0){
+		// update old location
+		$st = $app['pdo']->prepare("UPDATE locations SET latitude=:lat, longitude=:lon WHERE id=:id"); 
+		$st->execute(array(':lat' => $lat, ':lon' => $lon, ':id' => $id)); 
+		return $app->json(array("success" => "Location updated."), 200); 		
+	} else {
+		// insert new location
+		$st = $app['pdo']->prepare("INSERT INTO locations(id, latitude, longitude) VALUES(:id, :lat, :lon)"); 
+		$st->execute(array(':id' => $id, ':lat' => $lat, ':lon' => $lon)); 
+		return $app->json(array("success" => "New location stored."), 200); 	
+	}
+})
+->before($authPOST); 
 
 $app->get('/api/images/{id}', function($id) use($app) {
     $st = $app['pdo']->prepare('SELECT file FROM images WHERE id=:id');
