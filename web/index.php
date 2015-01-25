@@ -154,14 +154,40 @@ $app->get('/api/images/{id}', function($id) use($app) {
 })
 -> before($auth); 
 
+$app->post('/api/images', function(Request $request) use($app) {
+	$id = $request->get('id'); 
+	$image = $request->get('image_data'); 
+	$valid = v::string()->validate($image);
+	
+	if(empty($image) || !$valid) {
+		return $app->json(array("error" => "Please provide an image."), 400); 
+	}
+
+	$st = $app['pdo']->prepare("SELECT id FROM images WHERE id=:id"); 
+	$st->execute(array(':id' => $id));
+
+	if($st->rowCount() > 0){
+		// update old image
+		$st = $app['pdo']->prepare("UPDATE images SET file=:image WHERE id=:id");
+		$st->execute(array(':image' => $image));
+		return $app->json(array("success" => "Image updated."), 200); 
+	} else {
+		// insert new image
+		$st = $app['pdo']->prepare("INSERT INTO images(id, file) VALUES(:id, :image)");
+		$st->execute(array(':id' => $id, ':image' => $image));
+		return $app->json(array("success" => "New image stored."), 200); 
+	}
+}) 
+-> before($authPOST); 
+
 $app->delete('/api/images/{id}', function($id) use($app) {
     $st = $app['pdo']->prepare('DELETE FROM images WHERE id=:id');
     $st->execute(array(':id' => $id));
 
-    if($st->rowCount() > 0) {
-        return $app->json(array("error" => "No image was found with the given identification number."), 412);
+    if($st->rowCount() > 0) {    
+		return $app->json(array("message" => "success"), 200); 
     } else {
-        return $app->json(array("message" => "success"), 200); 
+        return $app->json(array("error" => "No image was found with the given identification number."), 412);
     }
 
     return $app->json(array("error" => "Something went wrong.  Please try again later."), 500);
