@@ -117,6 +117,14 @@ $authBOND = function(Request $request) use($app) {
 	}
 };
 
+$app->get('/api/bonds/{id}', function($id) use($app) {
+	$st = $app['pdo']->prepare('SELECT bond_id FROM bonds WHERE id1=:id OR id2=:id'); 
+	$st->execute(array(':id' => $id));
+    $row = $st->fetchAll(PDO::FETCH_ASSOC);
+	return $app->json($row, 200); 
+})
+-> before($auth);
+
 $app->post('/api/bonds', function(Request $request) use($app) {
 	$id1 = $request->get('id1'); 
 	$id2 = $request->get('id2');
