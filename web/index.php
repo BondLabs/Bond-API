@@ -40,6 +40,12 @@ if(getenv('DATABASE_URL')) {
     );
 }
 
+function doesexistID($id, $app) {
+	$st = $app['pdo']->prepare('SELECT phone FROM users WHERE id=:id');
+	$st->execute(array(':id' => $id));
+	return $st->rowCount(); 
+}
+
 // Our web handlers
 
 $app->get('/', function() use($app) {
@@ -92,6 +98,54 @@ $authPOST = function(Request $request) use($app) {
 
 	return autherrors($id, $auth, $app); 
 };
+
+$authBOND = function(Request $request) use($app) {
+	$auth = $request->headers->get('x-auth-key'); 
+	$id1 = $request->get('id1'); 
+	$id2 = $request->get('id2');
+
+    if($id1 < 1 || empty($id1) || $id2 < 1 || empty($id2)){
+        return $app->json(array("error" => "Please provide a valid identification number."), 400);
+    }
+    
+    if(empty($auth)) {
+        return $app->json(array("error" => "Authorization key is missing."), 403);     
+	}
+
+	if(!isauthkey($id1, $auth, $app) && !isauthkey($id2, $auth, $app)){
+        return $app->json(array("error" => "Invalid authorization key."), 401);
+	}
+};
+
+$app->post('/api/bonds', function(Request $request) use($app) {
+	$id1 = $request->get('id1'); 
+	$id2 = $request->get('id2');
+
+	if(empty($id1) || empty($id2)){
+		return $app->json(array("error" => "Please provide valid identification numbers."), 400); 
+	}
+
+	if($id1 >= $id2){
+		return $app->json(array("error" => "Identification number 1 must be less than identification number 2."), 400);
+	}
+
+	if(!doesexistID($id1, $app) || !doesexistID($id2, $app)){
+		return $app->json(array("error" => "Please provide valid identification numbers."), 400); 
+	}
+
+	$st = $app['pdo']->prepare('SELECT bond_id FROM bonds WHERE id1=:id1 AND id2=:id2'); 
+	$st->execute(array(':id1' => $id1, ':id2' => $id2)); 
+	
+	if($st->rowCount() > 0){
+		return $app->json(array("error" => "A bond with the given information already exists."), 409);
+	}
+
+	$st = $app['pdo']->prepare('INSERT INTO bonds(id1, id2) VALUES(:id1, :id2)');
+	$st->execute(array(':id1' => $id1, ':id2' => $id2));
+
+	return $app->json(array("success" => "New bond created."), 200);
+})
+-> before($authBOND); 
 
 $app->get('/api/locations/{id}', function($id) use($app) {
     $st = $app['pdo']->prepare('SELECT latitude, longitude FROM locations WHERE id=:id');
