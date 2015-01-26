@@ -58,7 +58,7 @@ $app->get('/api/', function(Request $request) use($app) {
 });
 
 function generatekey($id, $app) {
-	$rand = md5(uniqid($id, true));
+	$rand = md5(uniqid($id.time(), true));
 	$st = $app['pdo']->prepare('SELECT auth_key FROM users WHERE auth_key=:key');
 	$st->execute(array(':key' => $rand));
 	if($st->rowCount() < 1){
