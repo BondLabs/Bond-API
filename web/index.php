@@ -385,10 +385,13 @@ $app->post('/api/users', function(Request $request) use($app) {
 
         // hash the password
         $password = password_hash($password, PASSWORD_DEFAULT);
-        
+       
+		// generate auth key seed with phone number
+		$newkey = generatekey($phone, $app);
+
         // insert into the database 
-        $st = $app['pdo']->prepare("INSERT INTO users(name, phone, age, password) VALUES(:name, :phone, :age, :password) RETURNING id");
-        $st->execute(array('name' => $name, 'phone' => $phone, 'age' => $age, 'password' => $password));
+        $st = $app['pdo']->prepare("INSERT INTO users(name, phone, age, password, auth_key) VALUES(:name, :phone, :age, :password, :key) RETURNING id");
+        $st->execute(array('name' => $name, 'phone' => $phone, 'age' => $age, 'password' => $password, 'key' => $newkey));
         
         $insertedrow = $st->fetchAll(); 
 
