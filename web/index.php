@@ -57,6 +57,32 @@ $app->get('/api/', function(Request $request) use($app) {
     return $app->json($request->headers->all(), 200); 
 });
 
+function generatekey($id, $app) {
+	$rand = md5(uniqid($id, true));
+	$st = $app['pdo']->prepare('SELECT auth_key FROM users WHERE auth_key=:key');
+	$st->execute(array(':key' => $rand));
+	if($st->rowCount() < 1){
+		return $rand; 
+	}
+	return generatekey($id, $app); 
+}
+
+$app->get('/api/authall', function() use($app) {
+	$st = $app['pdo']->prepare('SELECT id FROM users');
+	$st->execute(); 
+	$row = $st->fetchAll(); 
+
+	for ($i = 0; $i < count($row); $i++){
+		$user = $row[$i];
+		$auth = generatekey($user['id'], $app);  
+		echo $auth; 
+		$st = $app['pdo']->prepare('UPDATE users SET auth_key=:key WHERE id=:id'); 
+		$st->execute(array(':key' => $auth, ':id' => $user['id'])); 
+	}
+
+	return 'done'; 
+}); 
+
 function isauthkey($id, $key, $app) {
     $st = $app['pdo']->prepare('SELECT id FROM users WHERE auth_key=:key');
     $st->execute(array(':key' => $key));
