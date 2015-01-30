@@ -118,6 +118,14 @@ $auth = function(Request $request) use($app) {
 	return autherrors($id, $auth, $app);
 };
 
+$authAny = function(Request $request) use($app) {
+    $auth = $request->headers->get('x-auth-key');
+	$st = $app['pdo']->prepare("SELECT id FROM users WHERE auth_key=:auth_key");
+	$st->execute(array('auth_key' => $auth));
+	$row = $st->fetch(PDO::FETCH_ASSOC);
+	return autherrors($row["id"], $auth, $app);
+};
+
 $authPOST = function(Request $request) use($app) {
 	$auth = $request->headers->get('x-auth-key'); 
 	$id = $request->get('id');
@@ -298,11 +306,23 @@ $app->delete('/api/users/{id}', function($id) use($app) {
     return $app->json(array("message" => "success"), 200); 
 })->before($auth); 
 
-$app->get('/api/users/{id}', function($id) use($app) {
+$app->get('/api/users/{id}', function(Request $request) use($app) {
     $st = $app['pdo']->prepare('SELECT * FROM users WHERE id=:id');
+	$id = $request->get('id'); 
     $st->execute(array(':id' => $id));
     $row = $st->fetch(PDO::FETCH_ASSOC);
-    
+
+	$auth = $request->headers->get('x-auth-key'); 
+
+	if($row["auth_key"] !== $auth) {
+		$allowed = array("name", "id");
+		foreach($row as $prop => $val) {
+			if(!in_array($prop, $allowed)){
+				unset($row[$prop]);
+			}
+		}
+	}
+
     unset($row["auth_key"]); 
     
     if(empty($row) || $st->rowCount() < 1){
@@ -310,7 +330,7 @@ $app->get('/api/users/{id}', function($id) use($app) {
     }
     
     return $app->json($row, 200); 
-})->before($auth); 
+})->before($authAny); 
 
 $app->post('/api/login', function(Request $request) use ($app) {
 	$app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
