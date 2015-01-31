@@ -46,7 +46,16 @@ function doesexistID($id, $app) {
 	return $st->rowCount(); 
 }
 
-function doesexistBOND($uid, $bid, $app) {
+function doesexistBOND($bid, $app) {
+	$st = $app['pdo']->prepare('SELECT id1 FROM bonds WHERE bond_id=:bid');
+	$st->execute(array(':bid' => $bid));
+	if($st->rowCount()) return true; 
+	return false; 
+}
+
+function doesexistBONDUSERS($uid, $bid, $app) {
+	if(!doesexistBOND($bid, $app)) return false;
+	
 	$st = $app['pdo']->prepare('SELECT id1, id2 FROM bonds WHERE bond_id=:id');
 	$st->execute(array(':id' => $bid));
 	$row = $st->fetch(PDO::FETCH_ASSOC);
@@ -132,6 +141,13 @@ function autherrors($id, $key, $app) {
 	}
 }
 
+// This middleware is to check for universal things with the auth_key
+// To see if it exists or not, and things like that 
+$authPRE = function(Request $request) use($app) {
+	$auth = $request->headers->get('x-auth-key');
+	if(empty($auth)) return $app->json(array("error" => "Authorization key is missing."), 403);
+}; 
+
 $auth = function(Request $request) use($app) {
     $auth = $request->headers->get('x-auth-key');
     $passeduid = $request->getRequestUri();
@@ -180,6 +196,39 @@ $authMESSAGE = function(Request $request) use($app) {
 	return autherrors($id, $auth, $app); 
 }; 
 
+$authBONDID = function(Request $request) use ($app) {
+	$auth = $request->headers->get('x-auth-key');
+	$bid = $request->get('bond_id');
+	
+	if(empty($auth)){
+		return $app->json(array("error" => "Authorization key is missing"), 403);	
+	}
+
+	if(!doesexistBOND($bid, $app)){
+		return $app->json(array("error" => "Please provide a valid identification number."), 400);
+	}
+
+	if(!isauthkeyforbond($bid, $auth, $app)){
+		return $app->json(array("error" => "Invalid authorization key."), 401);
+	}
+};
+
+$app->delete('/api/chats', function(Request $request) use($app) {
+	$app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$bond_id = $request->get('bond_id');
+	$st = $app['pdo']->prepare("DELETE FROM chats WHERE bond_id=:bid");
+	$st->execute(array(':bid' => $bond_id));
+	
+	if($st->rowCount()){
+		return $app->json(array("message" => "Success."), 200); 
+	} else {
+		return $app->json(array("error" => "No chat was found with the given identification number."), 412);
+	}
+	
+	$app->json(array("error" => "Something went wrong.  Please try again later."), 500); 
+})
+->before($authBONDID);
+
 $app->post('/api/chats', function(Request $request) use($app) {
 	$bond_id = $request->get('bond_id');
 	$user_id = $request->get('user_id');
@@ -189,7 +238,7 @@ $app->post('/api/chats', function(Request $request) use($app) {
 		return $app->json(array("message" => "Please provide a valid message."), 400);
 	}
 
-	if(doesexistBOND($user_id, $bond_id, $app)) {
+	if(doesexistBONDUSERS($user_id, $bond_id, $app)) {
 		$st = $app['pdo']->prepare("INSERT INTO chats (bond_id, id, messages) VALUES(:bid, :id, :msg)"); 
 		$st->execute(array(':bid' => $bond_id, ':id' => $user_id, ':msg' => $message));	
 		if($st->rowCount()){
