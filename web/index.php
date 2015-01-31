@@ -46,6 +46,16 @@ function doesexistID($id, $app) {
 	return $st->rowCount(); 
 }
 
+function doesexistBOND($uid, $bid, $app) {
+	$st = $app['pdo']->prepare('SELECT id1, id2 FROM bonds WHERE bond_id=:id');
+	$st->execute(array(':id' => $bid));
+	$row = $st->fetch(PDO::FETCH_ASSOC);
+	if(intval($uid) === intval($row['id1']) || intval($uid) === intval($row['id2'])){
+		return true; 	
+	}	
+	return false; 
+}
+
 // Our web handlers
 
 $app->get('/', function() use($app) {
@@ -150,6 +160,33 @@ $authBOND = function(Request $request) use($app) {
         return $app->json(array("error" => "Invalid authorization key."), 401);
 	}
 };
+
+$authMESSAGE = function(Request $request) use($app) {
+	$auth = $request->headers->get('x-auth-key'); 
+	$id = $request->get('user_id');
+	return autherrors($id, $auth, $app); 
+}; 
+
+$app->post('/api/chats', function(Request $request) use($app) {
+	$bond_id = $request->get('bond_id');
+	$user_id = $request->get('user_id');
+	$message = $request->get('message');
+	
+	if(empty($message)){
+		return $app->json(array("message" => "Please provide a valid message."), 400);
+	}
+
+	if(doesexistBOND($user_id, $bond_id, $app)) {
+		$st = $app['pdo']->prepare("INSERT INTO chats (bond_id, id, messages) VALUES(:bid, :id, :msg)"); 
+		$st->execute(array(':bid' => $bond_id, ':id' => $user_id, ':msg' => $message));	
+		if($st->rowCount()){
+			return $app->json(array("message" => "Success."), 200);
+		}
+	}
+
+	return $app->json(array("message" => "Something went wrong.  Please try again later."), 500); 
+})
+->before($authMESSAGE);
 
 $app->get('/api/bonds/{id}', function($id) use($app) {
 	$st = $app['pdo']->prepare('SELECT bond_id FROM bonds WHERE id1=:id OR id2=:id'); 
