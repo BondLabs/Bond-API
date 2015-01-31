@@ -105,6 +105,19 @@ function isauthkey($id, $key, $app) {
     return false;
 }
 
+function isauthkeyforbond($bid, $key, $app) {
+	$st = $app['pdo']->prepare('SELECT id1, id2 FROM bonds WHERE bond_id=:bid'); 
+	$st->execute(array(':bid' => $bid)); 
+	$row = $st->fetch(PDO::FETCH_ASSOC);	
+	$id1 = $row['id1']; 
+	$id2 = $row['id2'];
+	
+	if(isauthkey($id1, $key, $app) || isauthkey($id2, $key, $app)){
+		return true;
+	}
+	return false;
+}
+
 function autherrors($id, $key, $app) {	
 	if(!isauthkey($id, $key, $app)){
         return $app->json(array("error" => "Invalid authorization key."), 401);
