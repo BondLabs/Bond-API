@@ -65,6 +65,34 @@ function doesexistBONDUSERS($uid, $bid, $app) {
 	return false; 
 }
 
+function namesforotherusersinbonds($bid, $uid, $app) {
+	if(empty($bid) || empty($uid)){
+		return false; 		
+	}
+	$ids = array(); 
+	$names = array(); 
+	
+	$st = $app['pdo']->prepare('SELECT id1, id2 FROM bonds WHERE bond_id=:bid');
+	
+	foreach($bid as $bondid){
+		$st->execute(array(':bid' => $bondid));	
+		$row = $st->fetch(PDO::FETCH_ASSOC);
+		$ids[] = intval($row['id1']) === intval($uid) ? $row['id2'] : $row['id1'];
+	}
+
+	print_r($ids);
+	
+	$st = $app['pdo']->prepare("SELECT name FROM users WHERE id=:id");
+	
+	foreach($ids as $name){
+		$st->execute(array(':id' => $name));				
+		$row = $st->fetch(PDO::FETCH_ASSOC);
+		print_r($row);
+		$names[$name] = $row['name'];
+	}
+	return $names;
+}
+
 // Our web handlers
 
 $app->get('/', function() use($app) {
@@ -264,6 +292,11 @@ $app->get('/api/bonds/{id}', function($id) use($app) {
 	foreach($row as $bond){
 		$bonds[] = $bond['bond_id'];
 	}
+
+	$names = namesforotherusersinbonds($bonds, $id, $app);
+
+	print_r($names);
+
 	return $app->json($bonds, 200); 
 })
 -> before($auth);
