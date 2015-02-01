@@ -213,6 +213,12 @@ $authBONDID = function(Request $request) use ($app) {
 	}
 };
 
+$app->get('/api/chats/{bond_id}', function(Request $request) use($app) {
+	$st = $app['pdo']->prepare("SELECT id1, id2 FROM bonds WHERE bond_id=:bid");
+
+})
+->before($authBONDID); 
+
 $app->delete('/api/chats', function(Request $request) use($app) {
 	$app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	$bond_id = $request->get('bond_id');
@@ -254,7 +260,11 @@ $app->get('/api/bonds/{id}', function($id) use($app) {
 	$st = $app['pdo']->prepare('SELECT bond_id FROM bonds WHERE id1=:id OR id2=:id'); 
 	$st->execute(array(':id' => $id));
     $row = $st->fetchAll(PDO::FETCH_ASSOC);
-	return $app->json($row, 200); 
+	$bonds = array(); 
+	foreach($row as $bond){
+		$bonds[] = $bond['bond_id'];
+	}
+	return $app->json($bonds, 200); 
 })
 -> before($auth);
 
@@ -449,6 +459,10 @@ $app->post('/api/login', function(Request $request) use ($app) {
 	
 	$phone = $request->get('phone');
 	$password = $request->get('password');
+
+	if(empty($phone) || empty($password)){
+		return $app->json(array("error" => "Invalid parameters."), 400); 
+	}
 
     $st = $app['pdo']->prepare('SELECT id, auth_key, password FROM users WHERE phone=:phone');
     $st->execute(array(':phone' => $phone));
