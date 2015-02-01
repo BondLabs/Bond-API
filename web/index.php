@@ -77,15 +77,15 @@ function namesforotherusersinbonds($bid, $uid, $app) {
 	foreach($bid as $bondid){
 		$st->execute(array(':bid' => $bondid));	
 		$row = $st->fetch(PDO::FETCH_ASSOC);
-		$ids[] = intval($row['id1']) === intval($uid) ? $row['id2'] : $row['id1'];
+		$ids[$bondid] = intval($row['id1']) === intval($uid) ? $row['id2'] : $row['id1'];
 	}
 
 	$st = $app['pdo']->prepare("SELECT name FROM users WHERE id=:id");
 	
-	foreach($ids as $name){
+	foreach($ids as $key => $name){
 		$st->execute(array(':id' => $name));				
 		$row = $st->fetch(PDO::FETCH_ASSOC);
-		$names[$name] = $row['name'];
+		$names[$key] = $row['name'];
 	}
 	return $names;
 }
@@ -238,6 +238,18 @@ $authBONDID = function(Request $request) use ($app) {
 	}
 };
 
+$app->post('/api/match', function(Request $request) use($app) {
+	$id1 = $request->get('id1');
+	$id2 = $request->get('id2');
+	$st = $app['pdo']->prepare("SELECT traits from traits WHERE id=:id");	
+	$st->execute(array(':id' => $id1));
+	$traits1 = $st->fetch(PDO::FETCH_ASSOC);
+	$st->execute(array(':id' => $id2));
+	$traits2 = $st->fetch(PDO::FETCH_ASSOC);
+	$traits1 = $traits1['traits'];
+	$traits2 = $traits2['traits']; 
+}); 
+
 $app->get('/api/traits/{id}', function($id) use($app) {
 	$st = $app['pdo']->prepare("SELECT traits FROM traits WHERE id=:id");
 	$st->execute(array(':id' => $id));
@@ -258,15 +270,15 @@ $app->post('/api/traits', function(Request $request) use($app) {
 
 	$st = $app['pdo']->prepare("SELECT traits FROM traits WHERE id=:id");
 	$st->execute(array(':id' => $id));
-	
+
 	if($st->rowCount() > 0){
-		$st = $app['pdo']->prepare("UPDATE traits SET traits=:traits WHERE id=:id");
+		$st2 = $app['pdo']->prepare("UPDATE traits SET traits=:traits WHERE id=:id");
+		$st2->execute(array(':id' => $id, ':traits' => $traits));
 	} else {
-		$st = $app['pdo']->prepare("INSERT INTO traits(id, traits) VALUES(traits=:traits, id=:id");
+		$st2 = $app['pdo']->prepare("INSERT INTO traits(id, traits) VALUES(:id, :traits)");
+		$st2->execute(array(':id' => $id, ':traits' => $traits));
 	}
 
-	$st->execute(array(':id' => $id, ':traits' => $traits));
-	
 	return $app->json(array("message" => "Success."), 200);
 })
 ->before($authPOST);
