@@ -389,15 +389,19 @@ $app->delete('/api/images/{id}', function($id) use($app) {
     return $app->json(array("error" => "Something went wrong.  Please try again later."), 500);
 })->before($auth); 
 
-function doesexist($email, $app) {
-    $st = $app['pdo']->prepare('SELECT id FROM users WHERE email=:email');
-    $st->execute(array(':email' => $email));
+function doesexist($phone, $app) {
+    $st = $app['pdo']->prepare('SELECT id FROM users WHERE phone=:phone');
+    $st->execute(array(':phone' => $phone));
     $res = $st->fetch(PDO::FETCH_ASSOC);
     if($st->rowCount() > 0) {
         return true;
     }
     return false;
 }
+
+$app->get('/api/check/{phone}', function($phone) use($app) {
+	return $app->json(array("message" => doesexist($phone, $app)), 200); 
+}); 
 
 $app->delete('/api/users/{id}', function($id) use($app) {
     $st = $app['pdo']->prepare('DELETE FROM users WHERE id=:id');
