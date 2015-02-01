@@ -241,13 +241,31 @@ $authBONDID = function(Request $request) use ($app) {
 $app->post('/api/match', function(Request $request) use($app) {
 	$id1 = $request->get('id1');
 	$id2 = $request->get('id2');
-	$st = $app['pdo']->prepare("SELECT traits from traits WHERE id=:id");	
+
+	$st = $app['pdo']->prepare("SELECT traits FROM traits WHERE id=:id");	
 	$st->execute(array(':id' => $id1));
 	$traits1 = $st->fetch(PDO::FETCH_ASSOC);
+	
 	$st->execute(array(':id' => $id2));
 	$traits2 = $st->fetch(PDO::FETCH_ASSOC);
-	$traits1 = $traits1['traits'];
-	$traits2 = $traits2['traits']; 
+	
+	$total = str_split($traits1['traits']&$traits2['traits']); 
+	$count = 0;
+	
+	foreach($total as $bit){
+		++$count;
+	}
+
+	$st = $app['pdo']->prepare("SELECT age FROM users WHERE id=:id");
+	$st->execute(array(':id' => $id1));
+	$age1 = $st->fetch(PDO::FETCH_ASSOC)['age'];
+	
+	$st->execute(array(':id' => $id2));
+	$age2 = $st->fetch(PDO::FETCH_ASSOC)['age'];
+	
+	$diff = abs(intval($age1) - intval($age2));
+	$diff/=4;
+	return $diff+$count;
 }); 
 
 $app->get('/api/traits/{id}', function($id) use($app) {
