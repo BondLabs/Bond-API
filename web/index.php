@@ -238,6 +238,22 @@ $authBONDID = function(Request $request) use ($app) {
 	}
 };
 
+$app->post('/api/traits', function(Request $request) use($app) {
+	$app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$id = $request->get('id');
+	$traits = $request->get('traits');
+	$st = $app['pdo']->prepare("INSERT INTO traits (id, traits) VALUES(:id, :traits)");
+	try{
+		$st->execute(array(':id' => $id, ':traits' => $traits));
+	} catch (PDOException $e) {
+		return $app->json(array("error" => "Something went wrong.  Please try again later."), 500);
+	}
+	return $app->json(array("message" => "Success."), 200);
+})
+->before($authPOST);
+
+
+
 $app->get('/api/chats/{bond_id}', function($bond_id) use($app) {
 	if(!doesexistBOND($bond_id, $app)){
 		return $app->json(array("error", "Please provide a valid identification number."), 400); 	
@@ -264,7 +280,6 @@ $app->get('/api/chats/{bond_id}', function($bond_id) use($app) {
 ->before($authBONDID); 
 
 $app->delete('/api/chats', function(Request $request) use($app) {
-	$app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	$bond_id = $request->get('bond_id');
 	$st = $app['pdo']->prepare("DELETE FROM chats WHERE bond_id=:bid");
 	$st->execute(array(':bid' => $bond_id));
