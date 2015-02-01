@@ -242,12 +242,18 @@ $app->post('/api/traits', function(Request $request) use($app) {
 	$app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	$id = $request->get('id');
 	$traits = $request->get('traits');
-	$st = $app['pdo']->prepare("INSERT INTO traits (id, traits) VALUES(:id, :traits)");
-	try{
-		$st->execute(array(':id' => $id, ':traits' => $traits));
-	} catch (PDOException $e) {
-		return $app->json(array("error" => "Something went wrong.  Please try again later."), 500);
+
+	$st = $app['pdo']->prepare("SELECT traits FROM traits WHERE id=:id");
+	$st->execute(array(':id' => $id));
+	
+	if($st->rowCount() > 0){
+		$st = $app['pdo']->prepare("UPDATE traits SET traits=:traits WHERE id=:id");
+	} else {
+		$st = $app['pdo']->prepare("INSERT INTO traits(id, traits) VALUES(traits=:traits, id=:id");
 	}
+
+	$st->execute(array(':id' => $id, ':traits' => $traits));
+	
 	return $app->json(array("message" => "Success."), 200);
 })
 ->before($authPOST);
