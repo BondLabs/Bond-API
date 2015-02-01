@@ -291,10 +291,7 @@ $app->get('/api/bonds/{id}', function($id) use($app) {
 	}
 
 	$names = namesforotherusersinbonds($bonds, $id, $app);
-
-	print_r($names);
-
-	return $app->json($bonds, 200); 
+	return $app->json($names, 200); 
 })
 -> before($auth);
 
