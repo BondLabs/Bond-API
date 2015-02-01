@@ -258,7 +258,19 @@ $app->post('/api/traits', function(Request $request) use($app) {
 })
 ->before($authPOST);
 
+$app->delete('/api/traits', function(Request $request) use($app) {
+	$id = $request->get('id');
+	$st = $app['pdo']->prepare("DELETE FROM traits WHERE id=:id");	
+	$st->execute(array(':id' => $id));
+	if($st->rowCount() > 0) {
+		return $app->json(array("message" => "Success."), 200);
+	} else {
+		return $app->json(array("error" => "No traits were found for the given identification number."), 412);  
+	}
 
+	return $app->json(array("error" => "Something went wrong.  Please try again later."), 500);
+})
+->before($authPOST);
 
 $app->get('/api/chats/{bond_id}', function($bond_id) use($app) {
 	if(!doesexistBOND($bond_id, $app)){
