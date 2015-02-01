@@ -238,6 +238,19 @@ $authBONDID = function(Request $request) use ($app) {
 	}
 };
 
+$app->get('/api/traits/{id}', function($id) use($app) {
+	$st = $app['pdo']->prepare("SELECT traits FROM traits WHERE id=:id");
+	$st->execute(array(':id' => $id));
+	if($st->rowCount() > 0){
+		$row = $st->fetch(PDO::FETCH_ASSOC);	
+		return $app->json(array("traits" => $row['traits']), 200);
+	} else {
+		return $app->json(array("error" => "No traits were found for the given identification number."), 400);
+	}
+	return $app->json(array("error" => "Something went wrong.  Please try again later."), 500);	
+})
+->before($auth);
+
 $app->post('/api/traits', function(Request $request) use($app) {
 	$app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	$id = $request->get('id');
