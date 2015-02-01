@@ -80,14 +80,11 @@ function namesforotherusersinbonds($bid, $uid, $app) {
 		$ids[] = intval($row['id1']) === intval($uid) ? $row['id2'] : $row['id1'];
 	}
 
-	print_r($ids);
-	
 	$st = $app['pdo']->prepare("SELECT name FROM users WHERE id=:id");
 	
 	foreach($ids as $name){
 		$st->execute(array(':id' => $name));				
 		$row = $st->fetch(PDO::FETCH_ASSOC);
-		print_r($row);
 		$names[$name] = $row['name'];
 	}
 	return $names;
