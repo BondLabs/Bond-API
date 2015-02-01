@@ -238,9 +238,28 @@ $authBONDID = function(Request $request) use ($app) {
 	}
 };
 
-$app->get('/api/chats/{bond_id}', function(Request $request) use($app) {
-	$st = $app['pdo']->prepare("SELECT id1, id2 FROM bonds WHERE bond_id=:bid");
+$app->get('/api/chats/{bond_id}', function($bond_id) use($app) {
+	if(!doesexistBOND($bond_id, $app)){
+		return $app->json(array("error", "Please provide a valid identification number."), 400); 	
+	}
 
+	$st = $app['pdo']->prepare("SELECT id1, id2 FROM bonds WHERE bond_id=:bid");
+	$st->execute(array(':bid' => $bond_id));
+	$row = $st->fetch(PDO::FETCH_ASSOC);
+	
+	$id1 = $row['id1'];
+	$id2 = $row['id2'];
+
+	$st = $app['pdo']->prepare("SELECT id, messages, time FROM chats WHERE bond_id=:bid");
+	$st->execute(array(':bid' => $bond_id));
+	$row = $st->fetchAll(PDO::FETCH_ASSOC);
+
+	if($st->rowCount() < 1){
+		return $app->json(array("error" => "No chat was found for the given identification number."), 400); 
+	} else {
+		return $app->json(array("id1" => $id1, "id2" => $id2, "messages" => $row), 200);
+	}
+	return $app->json(array("error" => "Something went wrong.  Please try again later."), 500);	
 })
 ->before($authBONDID); 
 
