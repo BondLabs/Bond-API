@@ -4,8 +4,8 @@
     "monolog/monolog": "~1.7",
     "herrera-io/silex-pdo": "~1.2",
     "respect/validation": "0.7.*", 
-    "ext-mbstring": "*"
-    
+    "ext-mbstring": "*",
+     "parse/php-sdk" : "1.0.*"
   },
   "require-dev": {
     "heroku/heroku-buildpack-php": "*"

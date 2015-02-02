@@ -90,6 +90,22 @@ function namesforotherusersinbonds($bid, $uid, $app) {
 	return $names;
 }
 
+function nameforuid($uid, $app) {
+	$st = $app['pdo']->prepare("SELECT name FROM users WHERE id=:id");
+	$st->execute(array(':id' => $uid));
+	return $st->fetch(PDO::FETCH_ASSOC)['name'];
+}
+
+function bondpushtouser($uid, $name, $bid) {
+	ParsePush::send(array(
+		"channels" => [ "u".$uid  ],
+		data => array(
+			"alert" => "Meet ".$name."|".$bid,
+			"title" => "New Bond!"
+		)
+	));
+}
+
 // Our web handlers
 
 $app->get('/', function() use($app) {
@@ -413,8 +429,12 @@ $app->post('/api/bonds', function(Request $request) use($app) {
 		return $app->json(array("error" => "A bond with the given information already exists."), 409);
 	}
 
-	$st = $app['pdo']->prepare('INSERT INTO bonds(id1, id2) VALUES(:id1, :id2)');
+	$st = $app['pdo']->prepare('INSERT INTO bonds(id1, id2) VALUES(:id1, :id2) RETURNING id');
 	$st->execute(array(':id1' => $id1, ':id2' => $id2));
+    $ins = $st->fetchAll(); 
+
+	bondpushtouser($id1, nameforuid($id1), $ins[0]['id']);	
+	bondpushtouser($id2, nameforuid($id2), $ins[0]['id']);
 
 	return $app->json(array("success" => "New bond created."), 200);
 })
