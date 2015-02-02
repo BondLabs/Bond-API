@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6b6b87e0360ec4aec5c77fa473a85acd",
+    "hash": "c8799019475409bcb6aa5354e2c301e9",
     "packages": [
         {
             "name": "herrera-io/pdo-log",
@@ -188,6 +188,59 @@
                 "psr-3"
             ],
             "time": "2014-12-29 21:29:35"
+        },
+        {
+            "name": "parse/php-sdk",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ParsePlatform/parse-php-sdk.git",
+                "reference": "7ddeede84a7e3e4c9622860db6ead53e7b9cf102"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ParsePlatform/parse-php-sdk/zipball/7ddeede84a7e3e4c9622860db6ead53e7b9cf102",
+                "reference": "7ddeede84a7e3e4c9622860db6ead53e7b9cf102",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpdocumentor/phpdocumentor": "~2.5",
+                "phpunit/phpunit": "~4.0",
+                "squizlabs/php_codesniffer": "~1.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Parse\\": "src/Parse/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Parse Platform License"
+            ],
+            "authors": [
+                {
+                    "name": "Parse",
+                    "homepage": "https://github.com/parseplatform/parse-php-sdk/contributors"
+                }
+            ],
+            "description": "Parse PHP SDK",
+            "homepage": "https://github.com/parseplatform/parse-php-sdk",
+            "keywords": [
+                "parse",
+                "sdk"
+            ],
+            "time": "2014-11-17 21:17:55"
         },
         {
             "name": "pimple/pimple",
@@ -728,16 +781,16 @@
     "packages-dev": [
         {
             "name": "heroku/heroku-buildpack-php",
-            "version": "v57",
+            "version": "v59",
             "source": {
                 "type": "git",
                 "url": "https://github.com/heroku/heroku-buildpack-php.git",
-                "reference": "166ad317a307082d037a6d201ddb602f3295af9a"
+                "reference": "1746ff03c4c7e44a9c882efd1c90d30baa99f7d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/heroku/heroku-buildpack-php/zipball/166ad317a307082d037a6d201ddb602f3295af9a",
-                "reference": "166ad317a307082d037a6d201ddb602f3295af9a",
+                "url": "https://api.github.com/repos/heroku/heroku-buildpack-php/zipball/1746ff03c4c7e44a9c882efd1c90d30baa99f7d4",
+                "reference": "1746ff03c4c7e44a9c882efd1c90d30baa99f7d4",
                 "shasum": ""
             },
             "bin": [
@@ -768,7 +821,7 @@
                 "nginx",
                 "php"
             ],
-            "time": "2015-01-19 23:21:04"
+            "time": "2015-01-29 23:14:14"
         }
     ],
     "aliases": [],

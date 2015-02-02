@@ -12,6 +12,13 @@ use Respect\Validation\Validator as v;
 $app = new Silex\Application();
 $app['debug'] = true;
 
+use Parse\ParsePush;
+use Parse\ParseClient;
+
+ParseClient::initialize( "8wBDcHUWQuhjX3eUksIJMQDCpgvfeFzJcX548TIp", 
+						 "xAF1tTOKw7N2u7otV61IqpQT93oEVdzmtFX2gH1Y", 
+						 "G1nzj3xvLrATTnePWF457vXivR2SXpswb7qvyYiT" );
+
 
 // Register the monolog logging service
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
