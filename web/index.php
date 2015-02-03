@@ -338,7 +338,8 @@ $app->post('/api/match', function(Request $request) use($app) {
 	$id2 = $request->get('id2');
 
 	return matchingalgorithm($id1, $id2, $app);
-});
+})
+->before($authBOND);
 
 $app->get('/api/traits/{id}', function($id) use($app) {
 	$st = $app['pdo']->prepare("SELECT traits FROM traits WHERE id=:id");
@@ -696,6 +697,13 @@ $app->post('/api/users', function(Request $request) use($app) {
 //    $valid["email"] = v::email()->validate($email);
     $valid["phone"] = v::phone()->validate($phone); 
     $valid["age"] = v::numeric()->validate($age);
+	
+	$gender = strtolower($gender);
+	if($gender == "male" || $gender == "female"){
+		$valid["gender"] = 1; 	
+	} else {
+		$valid["gender"] = 0;
+	}
 
     $error = "";
 
@@ -725,8 +733,8 @@ $app->post('/api/users', function(Request $request) use($app) {
 		$newkey = generatekey($phone, $app);
 
         // insert into the database 
-        $st = $app['pdo']->prepare("INSERT INTO users(name, phone, age, password, auth_key) VALUES(:name, :phone, :age, :password, :key) RETURNING id");
-        $st->execute(array('name' => $name, 'phone' => $phone, 'age' => $age, 'password' => $password, 'key' => $newkey));
+        $st = $app['pdo']->prepare("INSERT INTO users(name, phone, age, password, auth_key, gender) VALUES(:name, :phone, :age, :password, :key, :gender) RETURNING id");
+        $st->execute(array('name' => $name, 'phone' => $phone, 'age' => $age, 'password' => $password, 'key' => $newkey, 'gender' => $gender));
         
         $insertedrow = $st->fetchAll(); 
 
