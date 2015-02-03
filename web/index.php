@@ -261,6 +261,32 @@ $authBONDID = function(Request $request) use ($app) {
 	}
 };
 
+$app->get('/api/mm/{id}', function($id) use($app) {
+	$major = floor($id / pow(2, 16));
+	$minor = $id % pow(2, 16);
+	return $app->json(array("major" => $major, "minor" => $minor), 200);
+});
+
+$app->post('/api/list', function(Request $request) use($app) {
+	$app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$id = $request->get('id');
+	$list = $request->get('list');
+
+	$st = $app['pdo']->prepare("SELECT list FROM links WHERE id=:id");
+	$st->execute(array(':id' => $id));
+	if($st->rowCount() > 0) {
+		//update
+		$st = $app['pdo']->prepare("UPDATE links SET list=:list WHERE id=:id");
+		$st->execute(array(':list' => $list, ':id' => $id));
+	} else {
+		//insert
+		$st = $app['pdo']->prepare("INSERT INTO links(id, list) VALUES(:id, :list)");
+		$st->execute(array(':id' => $id, ':list' => $list));
+	}
+	return $app->json(array("message" => "Success."));	
+})
+->before($authPOST);
+
 $app->post('/api/match', function(Request $request) use($app) {
 	$id1 = $request->get('id1');
 	$id2 = $request->get('id2');
