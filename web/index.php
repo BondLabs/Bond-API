@@ -330,7 +330,7 @@ $app->get('/image/{id}', function($id) use($app) {
 	$st = $app['pdo']->prepare("SELECT file from images WHERE id=:id");
 	$st->execute(array(':id' => $id));
 	$row = $st->fetchAll(PDO::FETCH_ASSOC);
-	return $app->json($row, 200);
+	return $row['file'];
 }); 
 
 $app->post('/api/match', function(Request $request) use($app) {
