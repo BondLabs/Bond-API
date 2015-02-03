@@ -337,8 +337,7 @@ $app->post('/api/match', function(Request $request) use($app) {
 	$id1 = $request->get('id1');
 	$id2 = $request->get('id2');
 
-	echo matchingalgorithm($id1, $id2, $app);
-	return "1";
+	return matchingalgorithm($id1, $id2, $app);
 });
 
 $app->get('/api/traits/{id}', function($id) use($app) {
@@ -557,7 +556,7 @@ $app->get('/api/images/{id}', function($id) use($app) {
     
     return $app->json($row, 200); 
 })
--> before($auth); 
+-> before($authAny); 
 
 $app->post('/api/images', function(Request $request) use($app) {
 	$id = $request->get('id'); 
