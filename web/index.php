@@ -329,7 +329,7 @@ $app->post('/api/list', function(Request $request) use($app) {
 $app->get('/image/{id}', function($id) use($app) {
 	$st = $app['pdo']->prepare("SELECT file from images WHERE id=:id");
 	$st->execute(array(':id' => $id));
-	$row = $st->fetchAll(PDO::FETCH_ASSOC);
+	$row = $st->fetch(PDO::FETCH_ASSOC);
 	return $row['file'];
 }); 
 
