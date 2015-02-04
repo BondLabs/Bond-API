@@ -220,6 +220,39 @@ function matchingalgorithm($id1, $id2, $app) {
 	return false; 
 }
 
+function createbond($id1, $id2, $app) {
+	$id1 = $request->get('id1'); 
+	$id2 = $request->get('id2');
+
+	if(empty($id1) || empty($id2)){
+		return $app->json(array("error" => "Please provide valid identification numbers."), 400); 
+	}
+
+	if($id1 >= $id2){
+		return $app->json(array("error" => "Identification number 1 must be less than identification number 2."), 400);
+	}
+
+	if(!doesexistID($id1, $app) || !doesexistID($id2, $app)){
+		return $app->json(array("error" => "Please provide valid identification numbers."), 400); 
+	}
+
+	$st = $app['pdo']->prepare('SELECT bond_id FROM bonds WHERE id1=:id1 AND id2=:id2'); 
+	$st->execute(array(':id1' => $id1, ':id2' => $id2)); 
+	
+	if($st->rowCount() > 0){
+		return $app->json(array("error" => "A bond with the given information already exists."), 409);
+	}
+
+	$st = $app['pdo']->prepare('INSERT INTO bonds(id1, id2) VALUES(:id1, :id2) RETURNING id');
+	$st->execute(array(':id1' => $id1, ':id2' => $id2));
+    $ins = $st->fetchAll(); 
+
+	bondpushtouser($id1, nameforuid($id1), $ins[0]['id']);	
+	bondpushtouser($id2, nameforuid($id2), $ins[0]['id']);
+
+	return $app->json(array("success" => "New bond created."), 200);
+}
+
 $app->get('/api/test/{id1}/{id2}', function($id1, $id2) use($app) {
 	$app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	$st = $app['pdo']->prepare("SELECT id, traits FROM traits WHERE id=:id1 OR id=:id2"); 
@@ -322,6 +355,10 @@ $app->post('/api/list', function(Request $request) use($app) {
 		$st = $app['pdo']->prepare("INSERT INTO links(id, list) VALUES(:id, :list)");
 		$st->execute(array(':id' => $id, ':list' => $list));
 	}
+
+	// check for bond between every one
+	// bond every one 
+
 	return $app->json(array("message" => "Success."));	
 })
 ->before($authPOST);
@@ -461,7 +498,15 @@ $app->get('/api/bonds/{id}', function($id) use($app) {
 	$names = namesforotherusersinbonds($bonds, $id, $app);
 	return $app->json($names, 200); 
 })
--> before($auth);
+->before($auth);
+
+$app->get('/api/bondsusers/{id}', function($id) use($app) {
+	$st = $app['pdo']->prepare('SELECT id1, id2 FROM bonds WHERE bond_id=:bid');
+	$st->execute(array(':bid' => $id));
+	$row = $st->fetch(PDO::FETCH_ASSOC);
+	return $app->json($row, 200);	
+})
+->before($authBONDID);
 
 $app->post('/api/bonds', function(Request $request) use($app) {
 	$id1 = $request->get('id1'); 
