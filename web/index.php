@@ -221,14 +221,11 @@ function matchingalgorithm($id1, $id2, $app) {
 }
 
 function createbond($id1, $id2, $app) {
-	$id1 = $request->get('id1'); 
-	$id2 = $request->get('id2');
-
 	if(empty($id1) || empty($id2)){
 		return $app->json(array("error" => "Please provide valid identification numbers."), 400); 
 	}
 
-	if($id1 >= $id2){
+	if($id1 > $id2){
 		return $app->json(array("error" => "Identification number 1 must be less than identification number 2."), 400);
 	}
 
@@ -358,6 +355,24 @@ $app->post('/api/list', function(Request $request) use($app) {
 
 	// check for bond between every one
 	// bond every one 
+	
+	$all = explode(",", $list);
+	$st = $app['pdo']->prepare("SELECT list FROM links WHERE id=:id");
+	$scraped = array(); 
+	foreach($list as $idi){
+		$st->execute(array(':id' => $idi));
+		$row = $st->fetch(PDO::FETCH_ASSOC);
+		$inrow = explode(",", $row);
+		$scraped = array_merge($scraped, $inrow);
+	}
+
+	foreach($scraped as $idi){
+		$id1 = $id > $idi ? $id : $idi; 
+		$id2 = $id > $idi ? $id : $idi; 
+		if(matchingalgorithm($id1, $id2, $app)){
+			createbond($id1, $id2, $app);	
+		}
+	}
 
 	return $app->json(array("message" => "Success."));	
 })
@@ -512,34 +527,7 @@ $app->post('/api/bondsusers', function(Request $request) use($app) {
 $app->post('/api/bonds', function(Request $request) use($app) {
 	$id1 = $request->get('id1'); 
 	$id2 = $request->get('id2');
-
-	if(empty($id1) || empty($id2)){
-		return $app->json(array("error" => "Please provide valid identification numbers."), 400); 
-	}
-
-	if($id1 >= $id2){
-		return $app->json(array("error" => "Identification number 1 must be less than identification number 2."), 400);
-	}
-
-	if(!doesexistID($id1, $app) || !doesexistID($id2, $app)){
-		return $app->json(array("error" => "Please provide valid identification numbers."), 400); 
-	}
-
-	$st = $app['pdo']->prepare('SELECT bond_id FROM bonds WHERE id1=:id1 AND id2=:id2'); 
-	$st->execute(array(':id1' => $id1, ':id2' => $id2)); 
-	
-	if($st->rowCount() > 0){
-		return $app->json(array("error" => "A bond with the given information already exists."), 409);
-	}
-
-	$st = $app['pdo']->prepare('INSERT INTO bonds(id1, id2) VALUES(:id1, :id2) RETURNING id');
-	$st->execute(array(':id1' => $id1, ':id2' => $id2));
-    $ins = $st->fetchAll(); 
-
-	bondpushtouser($id1, nameforuid($id1), $ins[0]['id']);	
-	bondpushtouser($id2, nameforuid($id2), $ins[0]['id']);
-
-	return $app->json(array("success" => "New bond created."), 200);
+	return createbond($id1, $id2, $app);
 })
 -> before($authBOND); 
 
