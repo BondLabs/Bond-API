@@ -500,9 +500,10 @@ $app->get('/api/bonds/{id}', function($id) use($app) {
 })
 ->before($auth);
 
-$app->get('/api/bondsusers/{id}', function($id) use($app) {
+$app->post('/api/bondsusers', function(Request $request) use($app) {
+	$bond_id = $request->get('bond_id');
 	$st = $app['pdo']->prepare('SELECT id1, id2 FROM bonds WHERE bond_id=:bid');
-	$st->execute(array(':bid' => $id));
+	$st->execute(array(':bid' => $bond_id));
 	$row = $st->fetch(PDO::FETCH_ASSOC);
 	return $app->json($row, 200);	
 })
