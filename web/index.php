@@ -724,9 +724,11 @@ $app->post('/api/users', function(Request $request) use($app) {
     $password = $request->get('password');
     $age = $request->get('age');
     $gender = $request->get('gender');
+	$relationship = $request->get('relationship');
 
     $valid = array();
     $valid["name"] = v::string()->length(1,32)->validate($name);
+    $valid["relationship"] = v::string()->length(1,10)->validate($relationship);
     $valid["password"] = v::string()->length(1,64)->validate($password);
 //    $valid["email"] = v::email()->validate($email);
     $valid["phone"] = v::phone()->validate($phone); 
@@ -767,8 +769,8 @@ $app->post('/api/users', function(Request $request) use($app) {
 		$newkey = generatekey($phone, $app);
 
         // insert into the database 
-        $st = $app['pdo']->prepare("INSERT INTO users(name, phone, age, password, auth_key, gender) VALUES(:name, :phone, :age, :password, :key, :gender) RETURNING id");
-        $st->execute(array('name' => $name, 'phone' => $phone, 'age' => $age, 'password' => $password, 'key' => $newkey, 'gender' => $gender));
+        $st = $app['pdo']->prepare("INSERT INTO users(name, phone, age, password, auth_key, gender, relationship) VALUES(:name, :phone, :age, :password, :key, :gender, :relationship) RETURNING id");
+        $st->execute(array('name' => $name, 'phone' => $phone, 'age' => $age, 'password' => $password, 'key' => $newkey, 'gender' => $gender, 'relationship' => $relationship));
         
         $insertedrow = $st->fetchAll(); 
 
