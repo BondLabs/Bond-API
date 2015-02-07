@@ -351,7 +351,7 @@ $adminauth = function(Request $request) use($app) {
 	}
 };
 
-$app->post('/analytics/usercount', function(Request $request) use($app) {
+$app->post('/analytics', function(Request $request) use($app) {
 	$st = $app['pdo']->prepare("SELECT id FROM users");
 	$st->execute();
 	$count = $st->rowCount();
