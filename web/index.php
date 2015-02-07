@@ -5,6 +5,7 @@
 require('../vendor/autoload.php');
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 // Validation class
 use Respect\Validation\Validator as v;
