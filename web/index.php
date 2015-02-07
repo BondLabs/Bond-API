@@ -104,6 +104,16 @@ function nameforuid($uid, $app) {
 	return $st->fetch(PDO::FETCH_ASSOC)['name'];
 }
 
+function chatpushtouser($uid, $name, $bid) {
+	ParsePush::send(array(
+		"channels" => [ "u".$uid  ],
+		data => array(
+			"alert" => "New Message ".$name."|".$bid,
+			"title" => "New Message!"
+		)
+	));
+}
+
 function bondpushtouser($uid, $name, $bid) {
 	ParsePush::send(array(
 		"channels" => [ "u".$uid  ],
@@ -511,7 +521,9 @@ $app->post('/api/chats', function(Request $request) use($app) {
 	if(doesexistBONDUSERS($user_id, $bond_id, $app)) {
 		$st = $app['pdo']->prepare("INSERT INTO chats (bond_id, id, messages) VALUES(:bid, :id, :msg)"); 
 		$st->execute(array(':bid' => $bond_id, ':id' => $user_id, ':msg' => $message));	
+		
 		if($st->rowCount()){
+			chatpushtouser($user_id, nameforuid($user_id, $app), $bond_id); 
 			return $app->json(array("message" => "Success."), 200);
 		}
 	}
