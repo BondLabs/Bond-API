@@ -331,10 +331,14 @@ $authBONDID = function(Request $request) use ($app) {
 	}
 };
 
+$app->get('/analytics/{key}', function($key) use($app) {
+	
+});
+
 $adminauth = function(Request $request) use($app) {
 	$key = $request->get('key');
 	$st = $app['pdo']->prepare("SELECT * FROM admins WHERE key=:key");
-	$st->execute(array('key' => $key));
+	$st->execute(array(':key' => $key));
 	echo $st->rowCount();
 	$row = $st->fetch(PDO::FETCH_ASSOC);
 	print_r($row);
@@ -779,7 +783,7 @@ $app->post('/api/users', function(Request $request) use($app) {
     if(empty($id)) {
         // new user might need to be created 
         // check if email exists
-        if(doesexist($email, $app)) {
+        if(doesexist($phone, $app)) {
             return $app->json(array("error" => "An account with the given information already exists."), 409); 
         }
         
