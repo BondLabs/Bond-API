@@ -335,11 +335,8 @@ $adminauth = function(Request $request) use($app) {
 	$st = $app['pdo']->prepare("SELECT key FROM admins WHERE key=:key");
 	$st->execute(array(':key' => $key));
 	$row = $st->fetch(PDO::FETCH_ASSOC);
-	echo $row['key'];
-	echo "\n";
-	echo $key;
 	
-	if($row['key'] !== $key){
+	if(strcmp($row['key'], $key) !== 0){
 		return $app->json(array('error' => 'invalid api key'), 400);
 	}
 };
