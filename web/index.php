@@ -522,8 +522,14 @@ $app->post('/api/chats', function(Request $request) use($app) {
 		$st = $app['pdo']->prepare("INSERT INTO chats (bond_id, id, messages) VALUES(:bid, :id, :msg)"); 
 		$st->execute(array(':bid' => $bond_id, ':id' => $user_id, ':msg' => $message));	
 		
+		$st2 = $app['pdo']->prepare("SELECT id1, id2 FROM bonds WHERE bond_id=:bid");
+		$st2->execute(array(':bid' => $bond_id));
+		$row = $st2->fetch(PDO::FETCH_ASSOC);
+			
+		$otherid = (intval($user_id) === intval($row['id1']))?$row['id2']:$row['id1'];
+
 		if($st->rowCount()){
-			chatpushtouser($user_id, nameforuid($user_id, $app), $bond_id); 
+			chatpushtouser($otherid, nameforuid($otherid, $app), $bond_id); 
 			return $app->json(array("message" => "Success."), 200);
 		}
 	}
