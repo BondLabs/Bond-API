@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Respect\Validation\Validator as v;
 
 $app = new Silex\Application();
+	
 $app['debug'] = true;
 
 use Parse\ParsePush;
@@ -332,10 +333,12 @@ $authBONDID = function(Request $request) use ($app) {
 
 $adminauth = function(Request $request) use($app) {
 	$key = $request->get('key');
-	$st = $app['pdo']->prepare("SELECT key FROM admins WHERE key=:key");
-	$st->execute(array(':key' => $key));
+	$st = $app['pdo']->prepare("SELECT * FROM admins WHERE key=:key");
+	$st->execute(array('key' => $key));
+	echo $st->rowCount();
 	$row = $st->fetch(PDO::FETCH_ASSOC);
-	
+	print_r($row);
+	echo $row['key'];	
 	if(strcmp($row['key'], $key) !== 0){
 		return $app->json(array('error' => 'invalid api key'), 400);
 	}
@@ -736,7 +739,8 @@ $app->post('/api/login', function(Request $request) use ($app) {
 
 // TODO: update existing user
 $app->post('/api/users', function(Request $request) use($app) {
-    $id = $request->get('id');
+	$app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$id = $request->get('id');
     $name = $request->get('name');
 //    $email = $request->get('email');
     $phone = $request->get('phone');
@@ -747,7 +751,7 @@ $app->post('/api/users', function(Request $request) use($app) {
 
     $valid = array();
     $valid["name"] = v::string()->length(1,32)->validate($name);
-    $valid["relationship"] = v::string()->length(1,10)->validate($relationship);
+    $valid["relationship"] = v::string()->length(1,30)->validate($relationship);
     $valid["password"] = v::string()->length(1,64)->validate($password);
 //    $valid["email"] = v::email()->validate($email);
     $valid["phone"] = v::phone()->validate($phone); 
