@@ -351,10 +351,11 @@ $adminauth = function(Request $request) use($app) {
 	}
 };
 
-$app->post('/analytics', function(Request $request) use($app) {
+$app->post('/analytics', function(Request $request, Response $response) use($app) {
 	$st = $app['pdo']->prepare("SELECT id FROM users");
 	$st->execute();
 	$count = $st->rowCount();
+	$response->headers->set('Access-Control-Allow-Origin', '*');
 	return $app->json(array('usercount' => $count), 200);
 })
 ->before($adminauth);
