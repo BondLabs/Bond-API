@@ -331,18 +331,11 @@ $authBONDID = function(Request $request) use ($app) {
 	}
 };
 
-$app->get('/analytics/{key}', function($key) use($app) {
-	
-});
-
 $adminauth = function(Request $request) use($app) {
 	$key = $request->get('key');
 	$st = $app['pdo']->prepare("SELECT * FROM admins WHERE key=:key");
 	$st->execute(array(':key' => $key));
-	echo $st->rowCount();
 	$row = $st->fetch(PDO::FETCH_ASSOC);
-	print_r($row);
-	echo $row['key'];	
 	if(strcmp($row['key'], $key) !== 0){
 		return $app->json(array('error' => 'invalid api key'), 400);
 	}
