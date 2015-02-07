@@ -330,6 +330,24 @@ $authBONDID = function(Request $request) use ($app) {
 	}
 };
 
+$adminauth = function(Request $request) use($app) {
+	$key = $request->get('key');
+	$st = $app['pdo']->prepare("SELECT key FROM admins WHERE key=:key");
+	$st->execute(array(':key' => $key));
+	$row = $st->fetch(PDO::FETCH_ASSOC);
+	if($row['key'] !== $key){
+		return $app->json(array('error' => 'invalid api key'), 400);
+	}
+};
+
+$app->post('/analytics/usercount', function(Request $request) use($app) {
+	$st = $app['pdo']->prepare("SELECT id FROM users");
+	$st->execute();
+	$count = $st->rowCount();
+	return $app->json(array('usercount' => $count), 200);
+})
+->before($adminauth);
+
 $app->get('/api/mm/{id}', function($id) use($app) {
 	$major = floor($id / pow(2, 16));
 	$minor = $id % pow(2, 16);
