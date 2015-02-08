@@ -257,12 +257,12 @@ function createbond($id1, $id2, $app) {
 		return $app->json(array("error" => "A bond with the given information already exists."), 409);
 	}
 
-	$st = $app['pdo']->prepare('INSERT INTO bonds(id1, id2) VALUES(:id1, :id2) RETURNING id');
+	$st = $app['pdo']->prepare('INSERT INTO bonds(id1, id2) VALUES(:id1, :id2) RETURNING bond_id');
 	$st->execute(array(':id1' => $id1, ':id2' => $id2));
     $ins = $st->fetchAll(); 
 
-	bondpushtouser($id1, nameforuid($id1, $app), nameforuid($id2, $app), $ins[0]['id']);	
-	bondpushtouser($id2, nameforuid($id2, $app), nameforuid($id1, $app), $ins[0]['id']);
+	bondpushtouser($id1, nameforuid($id1, $app), nameforuid($id2, $app), $ins[0]['bond_id']);	
+	bondpushtouser($id2, nameforuid($id2, $app), nameforuid($id1, $app), $ins[0]['bond_id']);
 
 	return $app->json(array("success" => "New bond created."), 200);
 }
