@@ -109,7 +109,8 @@ function chatpushtouser($uid, $name, $bid) {
 		"channels" => [ "u".$uid  ],
 		data => array(
 			"alert" => $name." has sent you a new message.|".$bid,
-			"title" => "New Message!"
+			"title" => "New Message!",
+			"bid" => $bid
 		)
 	));
 }
