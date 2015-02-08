@@ -352,14 +352,18 @@ $adminauth = function(Request $request) use($app) {
 	}
 };
 
+$cors = function(Request $request, Response $responze) use($app) {
+	$response->headers->set('Access-Control-Allow-Origin', '*');
+};
+
 $app->post('/analytics', function(Request $request, Response $response) use($app) {
 	$st = $app['pdo']->prepare("SELECT id FROM users");
 	$st->execute();
 	$count = $st->rowCount();
-	$response->headers->set('Access-Control-Allow-Origin', '*');
 	return $app->json(array('usercount' => $count), 200);
 })
-->before($adminauth);
+->before($adminauth)
+->after($cors);
 
 $app->get('/api/mm/{id}', function($id) use($app) {
 	$major = floor($id / pow(2, 16));
