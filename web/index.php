@@ -112,17 +112,19 @@ function chatpushtouser($uid, $name, $bid, $message) {
 			"title" => "New Message!",
 			"bid" => $bid,
 			"name" => $name,
-			"msg" => $message
+			"msg" => $message,
+			"type" => "chat"
 		)
 	));
 }
 
-function bondpushtouser($uid, $name, $bid) {
+function bondpushtouser($uid, $name, $othername, $bid) {
 	ParsePush::send(array(
 		"channels" => [ "u".$uid  ],
 		data => array(
-			"alert" => "Meet ".$name."|".$bid,
-			"title" => "New Bond!"
+			"alert" => "Hi ".$name.", you should meet ".$othername.". Open for details.",
+			"title" => "New Bond!",
+			"bid" => $bid
 		)
 	));
 }
@@ -258,8 +260,8 @@ function createbond($id1, $id2, $app) {
 	$st->execute(array(':id1' => $id1, ':id2' => $id2));
     $ins = $st->fetchAll(); 
 
-	bondpushtouser($id1, nameforuid($id1), $ins[0]['id']);	
-	bondpushtouser($id2, nameforuid($id2), $ins[0]['id']);
+	bondpushtouser($id1, nameforuid($id1), nameforuid($id2), $ins[0]['id']);	
+	bondpushtouser($id2, nameforuid($id2), nameforuid($id1), $ins[0]['id']);
 
 	return $app->json(array("success" => "New bond created."), 200);
 }
