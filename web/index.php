@@ -104,14 +104,15 @@ function nameforuid($uid, $app) {
 	return $st->fetch(PDO::FETCH_ASSOC)['name'];
 }
 
-function chatpushtouser($uid, $name, $bid) {
+function chatpushtouser($uid, $name, $bid, $message) {
 	ParsePush::send(array(
 		"channels" => [ "u".$uid  ],
 		data => array(
 			"alert" => $name." has sent you a new message.",
 			"title" => "New Message!",
 			"bid" => $bid,
-			"name" => $name
+			"name" => $name,
+			"msg" => $message
 		)
 	));
 }
@@ -538,7 +539,7 @@ $app->post('/api/chats', function(Request $request) use($app) {
 		$otherid = (intval($user_id) === intval($row['id1']))?$row['id2']:$row['id1'];
 
 		if($st->rowCount()){
-			chatpushtouser($otherid, nameforuid($user_id, $app), $bond_id); 
+			chatpushtouser($otherid, nameforuid($user_id, $app), $bond_id, $message); 
 			return $app->json(array("message" => "Success."), 200);
 		}
 	}
