@@ -5,7 +5,8 @@
     "herrera-io/silex-pdo": "~1.2",
     "respect/validation": "0.7.*", 
     "ext-mbstring": "*",
-     "parse/php-sdk" : "1.0.*"
+     "parse/php-sdk" : "1.0.*",
+    "jdesrosiers/silex-cors-provider": "~0.1"
   },
   "require-dev": {
     "heroku/heroku-buildpack-php": "*"

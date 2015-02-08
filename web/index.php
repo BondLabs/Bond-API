@@ -27,6 +27,10 @@ $app->register(new Silex\Provider\MonologServiceProvider(), array(
   'monolog.logfile' => 'php://stderr',
 ));
 
+$app->register(new CorsServiceProvider(), array(
+	'cors.allowOrigin' => 'http://analytics.bond.sh',
+));
+
 $dbopts = parse_url(getenv('DATABASE_URL'));
 
 if(getenv('DATABASE_URL')) {
@@ -352,10 +356,6 @@ $adminauth = function(Request $request) use($app) {
 	}
 };
 
-$cors = function(Request $request, Response $responze) use($app) {
-	$response->headers->set('Access-Control-Allow-Origin', '*');
-};
-
 $app->post('/analytics', function(Request $request, Response $response) use($app) {
 	$st = $app['pdo']->prepare("SELECT id FROM users");
 	$st->execute();
@@ -366,7 +366,7 @@ $app->post('/analytics', function(Request $request, Response $response) use($app
 	return $app->json(array('usercount' => $count), 200);
 })
 ->before($adminauth)
-->after($cors);
+->after($app["cors"]);
 
 $app->get('/api/mm/{id}', function($id) use($app) {
 	$major = floor($id / pow(2, 16));
