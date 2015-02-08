@@ -354,8 +354,15 @@ $adminauth = function(Request $request) use($app) {
 $app->get('/analytics/{key}', function(Request $request) use($app) {
 	$st = $app['pdo']->prepare("SELECT id FROM users");
 	$st->execute();
-	$count = $st->rowCount();
-	return $app->json(array('usercount' => $count), 200);
+	$usercount = $st->rowCount();
+
+	$st = $app['pdo']->prepare("SELECT bond_id FROM bonds");
+	$st->execute();
+	$bondcount = $st->rowCount();
+
+	$userbondratio = $usercount/$bondcount; 
+
+	return $app->json(array('usercount' => $usercount, 'bondcount' => $bondcount, 'userbondratio' => $userbondratio), 200);
 })
 ->before($adminauth);
 
