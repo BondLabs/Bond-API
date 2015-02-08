@@ -535,8 +535,6 @@ $app->post('/api/chats', function(Request $request) use($app) {
 			
 		$otherid = (intval($user_id) === intval($row['id1']))?$row['id2']:$row['id1'];
 
-		echo $otherid;
-
 		if($st->rowCount()){
 			chatpushtouser($otherid, nameforuid($user_id, $app), $bond_id); 
 			return $app->json(array("message" => "Success."), 200);
