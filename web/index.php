@@ -533,10 +533,12 @@ $app->post('/api/chats', function(Request $request) use($app) {
 		$st2->execute(array(':bid' => $bond_id));
 		$row = $st2->fetch(PDO::FETCH_ASSOC);
 			
-		$otherid = (intval($user_id) == intval($row['id1']))?$row['id2']:$row['id1'];
+		$otherid = (intval($user_id) === intval($row['id1']))?$row['id2']:$row['id1'];
+
+		echo $otherid;
 
 		if($st->rowCount()){
-			chatpushtouser($otherid, nameforuid($otherid, $app), $bond_id); 
+			chatpushtouser($otherid, nameforuid($user_id, $app), $bond_id); 
 			return $app->json(array("message" => "Success."), 200);
 		}
 	}
