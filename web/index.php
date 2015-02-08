@@ -108,7 +108,7 @@ function chatpushtouser($uid, $name, $bid) {
 	ParsePush::send(array(
 		"channels" => [ "u".$uid  ],
 		data => array(
-			"alert" => "New Message ".$name."|".$bid,
+			"alert" => $name." has sent you a new message.|".$bid,
 			"title" => "New Message!"
 		)
 	));
