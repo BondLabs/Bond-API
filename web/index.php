@@ -360,7 +360,7 @@ $app->get('/analytics/{key}', function(Request $request) use($app) {
 	$st->execute();
 	$bondcount = $st->rowCount();
 
-	$userbondratio = $usercount/$bondcount; 
+	$userbondratio = round($usercount/$bondcount, 2); 
 
 	return $app->json(array('usercount' => $usercount, 'bondcount' => $bondcount, 'userbondratio' => $userbondratio), 200);
 })
