@@ -5,7 +5,6 @@
 require('../vendor/autoload.php');
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 // Validation class
 use Respect\Validation\Validator as v;
@@ -25,10 +24,6 @@ ParseClient::initialize( "8wBDcHUWQuhjX3eUksIJMQDCpgvfeFzJcX548TIp",
 // Register the monolog logging service
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
   'monolog.logfile' => 'php://stderr',
-));
-
-$app->register(new CorsServiceProvider(), array(
-	'cors.allowOrigin' => 'analytics.bond.sh',
 ));
 
 $dbopts = parse_url(getenv('DATABASE_URL'));
@@ -356,17 +351,13 @@ $adminauth = function(Request $request) use($app) {
 	}
 };
 
-$app->post('/analytics', function(Request $request, Response $response) use($app) {
+$app->get('/analytics/{key}', function(Request $request) use($app) {
 	$st = $app['pdo']->prepare("SELECT id FROM users");
 	$st->execute();
 	$count = $st->rowCount();
-    $response->headers->set("Access-Control-Allow-Origin","*");
-	$response->headers->set("Access-Control-Allow-Methods","GET,POST,PUT,DELETE,OPTIONS");
-    $response->headers->set("Access-Control-Allow-Headers","Content-Type");
 	return $app->json(array('usercount' => $count), 200);
 })
-->before($adminauth)
-->after($app["cors"]);
+->before($adminauth);
 
 $app->get('/api/mm/{id}', function($id) use($app) {
 	$major = floor($id / pow(2, 16));
