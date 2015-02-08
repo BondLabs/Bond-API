@@ -261,8 +261,8 @@ function createbond($id1, $id2, $app) {
 	$st->execute(array(':id1' => $id1, ':id2' => $id2));
     $ins = $st->fetchAll(); 
 
-	bondpushtouser($id1, nameforuid($id1), nameforuid($id2), $ins[0]['id']);	
-	bondpushtouser($id2, nameforuid($id2), nameforuid($id1), $ins[0]['id']);
+	bondpushtouser($id1, nameforuid($id1, $app), nameforuid($id2, $app), $ins[0]['id']);	
+	bondpushtouser($id2, nameforuid($id2, $app), nameforuid($id1, $app), $ins[0]['id']);
 
 	return $app->json(array("success" => "New bond created."), 200);
 }
