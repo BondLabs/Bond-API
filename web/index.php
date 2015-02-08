@@ -124,7 +124,8 @@ function bondpushtouser($uid, $name, $othername, $bid) {
 		data => array(
 			"alert" => "Hi ".$name.", you should meet ".$othername.". Open for details.",
 			"title" => "New Bond!",
-			"bid" => $bid
+			"bid" => $bid,
+			"type" => "bond"
 		)
 	));
 }
