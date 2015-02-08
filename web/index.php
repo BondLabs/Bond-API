@@ -360,6 +360,9 @@ $app->post('/analytics', function(Request $request, Response $response) use($app
 	$st = $app['pdo']->prepare("SELECT id FROM users");
 	$st->execute();
 	$count = $st->rowCount();
+    $response->headers->set("Access-Control-Allow-Origin","*");
+	$response->headers->set("Access-Control-Allow-Methods","GET,POST,PUT,DELETE,OPTIONS");
+    $response->headers->set("Access-Control-Allow-Headers","Content-Type");
 	return $app->json(array('usercount' => $count), 200);
 })
 ->before($adminauth)
