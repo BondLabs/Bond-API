@@ -28,7 +28,7 @@ $app->register(new Silex\Provider\MonologServiceProvider(), array(
 ));
 
 $app->register(new CorsServiceProvider(), array(
-	'cors.allowOrigin' => 'http://analytics.bond.sh',
+	'cors.allowOrigin' => 'analytics.bond.sh',
 ));
 
 $dbopts = parse_url(getenv('DATABASE_URL'));
