@@ -93,7 +93,7 @@ function namesforotherusersinbonds($bid, $uid, $app) {
 	foreach($ids as $key => $name){
 		$st->execute(array(':id' => $name));				
 		$row = $st->fetch(PDO::FETCH_ASSOC);
-		$names[$key] = $row['name'];
+		$names[$name] = $row['name'];
 	}
 	return $names;
 }
