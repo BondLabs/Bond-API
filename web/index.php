@@ -631,7 +631,7 @@ $app->post('/api/locations', function(Request $request) use($app) {
 ->before($authPOST); 
 
 $app->get('/api/images/{id}', function($id) use($app) {
-    $st = $app['pdo']->prepare('SELECT file FROM images WHERE id=:id');
+    $st = $app['pdo']->prepare('SELECT id, file FROM images WHERE id=:id');
     $st->execute(array(':id' => $id));
     $row = $st->fetch(PDO::FETCH_ASSOC);
     
