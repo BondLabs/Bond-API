@@ -54,6 +54,12 @@ function doesexistID($id, $app) {
 	return $st->rowCount(); 
 }
 
+function doesexistPHONE($phone, $app) {
+	$st = $app['pdo']->prepare('SELECT id FROM users WHERE phone=:phone');
+	$st->execute(array(':phone' => $phone));
+	return $st->rowCount();
+}
+
 function doesexistBOND($bid, $app) {
 	$st = $app['pdo']->prepare('SELECT id1 FROM bonds WHERE bond_id=:bid');
 	$st->execute(array(':bid' => $bid));
@@ -372,10 +378,9 @@ $app->get('/analytics/{key}', function(Request $request) use($app) {
 })
 ->before($adminauth);
 
-$app->get('/api/mm/{id}', function($id) use($app) {
-	$major = floor($id / pow(2, 16));
-	$minor = $id % pow(2, 16);
-	return $app->json(array("major" => $major, "minor" => $minor), 200);
+$app->get('/api/{phone}', function($phone) use($app) {
+	$value = doesexistPHONE($phone, $app);	
+	return $app->json(array("doesexist" => $value), 200);
 });
 
 $app->post('/api/list', function(Request $request) use($app) {
@@ -457,7 +462,7 @@ $app->post('/api/traits', function(Request $request) use($app) {
 	$st->execute(array(':id' => $id));
 
 	if($st->rowCount() > 0){
-		$st2 = $app['pdo']->prepare("UPDATE traits SET traits=:traits WHERE id=:id");
+		$st1 = $app['pdo']->prepare("UPDATE traits SET traits=:traits WHERE id=:id");
 		$st2->execute(array(':id' => $id, ':traits' => $traits));
 	} else {
 		$st2 = $app['pdo']->prepare("INSERT INTO traits(id, traits) VALUES(:id, :traits)");
