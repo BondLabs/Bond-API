@@ -451,7 +451,7 @@ $app->get('/api/traits/{id}', function($id) use($app) {
 	}
 	return $app->json(array("error" => "Something went wrong.  Please try again later."), 500);	
 })
-->before($auth);
+->before($authAny);
 
 $app->post('/api/traits', function(Request $request) use($app) {
 	$app['pdo']->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
