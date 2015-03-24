@@ -432,6 +432,14 @@ $app->get('/image/{id}', function($id) use($app) {
 	return $row['file'];
 }); 
 
+$app->get('/rawImage/{id}', function($id) use($app) {
+	$st = $app['pdo']->prepare("SELECT file from images WHERE id=:id");
+	$st->execute(array(':id' => $id));
+	$row = $st->fetch(PDO::FETCH_ASSOC);
+	$file = $row['file'];
+	echo "<html><img src='data:image/png;base64," . $file . "'></html>";
+}); 
+
 $app->post('/api/match', function(Request $request) use($app) {
 	$id1 = $request->get('id1');
 	$id2 = $request->get('id2');
