@@ -432,7 +432,7 @@ $app->get('/image/{id}', function($id) use($app) {
 	return $row['file'];
 }); 
 
-$app->get('/rawImage/{id}', function($id) use($app) {
+$app->get('/api/rawImage/{id}', function($id) use($app) {
 	$st = $app['pdo']->prepare("SELECT file from images WHERE id=:id");
 	$st->execute(array(':id' => $id));
 	$row = $st->fetch(PDO::FETCH_ASSOC);
