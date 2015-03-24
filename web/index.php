@@ -438,6 +438,8 @@ $app->get('/rawImage/{id}', function($id) use($app) {
 	$row = $st->fetch(PDO::FETCH_ASSOC);
 	$file = $row['file'];
 	echo "<html><img src='data:image/png;base64," . $file . "'></html>";
+	echo $file;
+	return $file;
 }); 
 
 $app->post('/api/match', function(Request $request) use($app) {
