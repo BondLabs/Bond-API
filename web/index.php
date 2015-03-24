@@ -438,10 +438,10 @@ $app->get('/api/rawImage/{id}', function($id) use($app) {
 	$row = $st->fetch(PDO::FETCH_ASSOC);
 	$file = $row['file'];
 	$string = str_replace(array("\n", "\r"), '', $file);
-	//echo "<html><img src='data:image/png;base64," . $file . "'></html>";
+	echo "<html><img src='data:image/png;base64," . $file . "'></html>";
 	//echo $file;
-	//return $string;
-	return "<html><img src=\"data:image/jpeg;base64," . $string . "\"></html>";
+	return $string;
+	//return "<html><img src=\"data:image/jpeg;base64," . $string . "\"></html>";
 }); 
 
 $app->post('/api/match', function(Request $request) use($app) {
