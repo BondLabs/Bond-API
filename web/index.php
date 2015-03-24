@@ -441,7 +441,7 @@ $app->get('/api/rawImage/{id}', function($id) use($app) {
 	//echo "<html><img src='data:image/png;base64," . $file . "'></html>";
 	//echo $file;
 	//return $file;
-	return "<html><img src=\"data:image/png;base64," . $string . "\"></html>";
+	return "<html><img src=\"data:image/jpeg;base64," . $string . "\"></html>";
 }); 
 
 $app->post('/api/match', function(Request $request) use($app) {
